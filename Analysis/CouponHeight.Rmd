@@ -1,0 +1,74 @@
+SMPY Descriptives
+=================================================
+This report summarizes the NLSY79 Gen1 variables that correspond to the health items in the SMPY.
+
+<!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of only one directory.-->
+```{r, echo=TRUE, message=F} 
+# cat("Working directory: ", getwd())
+
+# if( basename(getwd()) == "Analysis" ) {
+  opts_knit$set(root.dir='../')  #Don't combine this call with any other chunk -especially one that uses file paths.
+# }
+```
+
+<!-- Set the report-wide options, and point to the external code file. -->
+```{r set_options, echo=TRUE}
+# pathInput <- "./Data/Raw/CouponPitDepth.csv"
+# ds <- read.csv(pathInput, stringsAsFactors=FALSE)
+# str(ds)
+
+cat("Working directory: ", getwd())
+require(knitr)
+opts_chunk$set(
+    results='show', 
+    comment = NA, 
+    tidy = FALSE,
+    dpi = 100,
+    fig.width = 6.5, 
+    fig.height = 4, 
+    fig.path = 'figure_raw/'
+)
+#     dev = "png"#,
+#     dpi = 400
+#     dpi = 100
+#     out.width = "600px", #This affects only the markdown, not the underlying png file.  The height will be scaled appropriately.
+
+echoChunks <- FALSE
+options(width=120) #So the output is 50% wider than the default.
+read_chunk("./Analysis/CouponHeight.R") 
+```
+<!-- Load the packages.  Suppress the output when loading packages. --> 
+```{r LoadPackages, echo=echoChunks, message=FALSE}
+```
+
+<!-- Load any Global functions and variables declared in the R file.  Suppress the output. --> 
+```{r DeclareGlobals, echo=echoChunks, results='show', message=FALSE}
+```
+
+<!-- Declare any global functions specific to a Rmd output.  Suppress the output. --> 
+```{r, echo=echoChunks, message=FALSE}
+```
+
+<!-- Load the datasets.   -->
+```{r LoadData, echo=echoChunks, results='show', message=FALSE}
+```
+
+<!-- Tweak the datasets.   -->
+```{r TweakData, echo=echoChunks, results='show', message=FALSE}
+```
+
+## 1. Histogram Overlay
+```{r HistogramOverlay, echo=echoChunks, results='asis', message=TRUE, fig.height = 10}
+```
+
+## 2. Coupon Summary Boxplot
+```{r CouponSummaryBoxplot, echo=echoChunks, results='asis', message=TRUE}
+```
+
+## Session Information
+For the sake of documentation and reproducibility, the current report was build on a system using the following software.
+
+```{r session_info, echo=FALSE}
+cat("Report created by", Sys.info()["user"], "at", strftime(Sys.time(), "%F, %T %z"))
+sessionInfo()
+```
