@@ -39,16 +39,29 @@ SummarizeCoupon <- function( d ) {
 # }
 ############################
 ## @knitr LoadData
-ds <- read.csv(pathInput, stringsAsFactors=FALSE)
-
+dsSummary <- read.csv(pathInput, stringsAsFactors=FALSE)
+# summary(dsSummary)
+# sapply(dsSummary, class)
+# sapply(dsSummary, FUN=function(x){sum(is.na(x))})
 ############################
 ## @knitr TweakData
-ds$Treatment <- factor(ds$Treatment)
-ds$CouponID <- factor(ds$CouponID)
+dsSummary$ID <- seq_along(dsSummary$CouponID)
+dsSummary$ProportionAtHeight <- dsSummary$PercentageAtHeight / 100
+dsSummary$Treatment <- factor(dsSummary$Treatment)
+dsSummary$CouponID <- factor(dsSummary$CouponID)
 
+ExpandSummary <- function( d ) {
+  probeCount <- round(d$ProportionAtHeight * 2501)
+  data.frame(
+    Treatment = rep(d$Treatment, each=probeCount),
+    CouponID = rep(d$CouponID, each=probeCount),
+    ProbeHeight = rep(d$ProbeHeight, each=probeCount)
+  )
+}
+dsProbe <- plyr::ddply(dsSummary, .variables="ID", ExpandSummary)
 # ds$PercentageAtHeight * 2501
-ds$ProportionAtHeight <- ds$PercentageAtHeight / 100
-ds$WeightedHeight <- ds$ProbeHeight * ds$ProportionAtHeight
+
+dsSummary$WeightedHeight <- dsSummary$ProbeHeight * dsSummary$ProportionAtHeight
 
 # bootSpread(scores=ds$ProbeHeight, weights=round(2500*ds$ProportionAtHeight))
 
@@ -58,18 +71,37 @@ ds$WeightedHeight <- ds$ProbeHeight * ds$ProportionAtHeight
 # coef(lm(ProbeHeight ~ 1, data=ds, weights=ProportionAtHeight))
 # summary(lm(ProbeHeight ~ 1 + Treatment, data=ds, weights=ProportionAtHeight))
 # 
-summary(lmer(ProbeHeight ~ 1 + Treatment + (1|CouponID), data=ds, weights=ds$ProportionAtHeight))
+m <- lmer(ProbeHeight ~ 1 + Treatment + (1|CouponID), data=dsProbe)
+summary(m)
+seFixedEffects <- arm::se.fixef(m)
 
-dsCoupon <- plyr::ddply(ds, c("Treatment", "CouponID"), SummarizeCoupon)
+# m <-lmer(ProbeHeight ~ 1 + Treatment + (1|CouponID), data=dsSummary, weights=ProportionAtHeight)
+# summary(m)
+# arm::se.fixef(m)
+m0 <- lmer(ProbeHeight ~ 0 + Treatment + (1|CouponID), data=dsSummary, weights=ProportionAtHeight)
 
-dsTreatment <- plyr::ddply(ds, c("Treatment"), SummarizeCoupon)
+
+dsMlm <- data.frame(Effect=fixef(m0), SE=seFixedEffects)
+dsMlm$Treatment <- gsub("(Treatment)", replacement="", rownames(dsMlm), perl=TRUE);
+dsMlm$CILower <- dsMlm$Effect - dsMlm$SE
+dsMlm$CIUpper <- dsMlm$Effect + dsMlm$SE
+
+# grep("(?<=Treatment)(\\w+)\\b", names(f), perl=TRUE, value=TRUE);
+# gsub("Treatment(\\w+)", replacement="\\2", names(f), perl=TRUE);
+  
+dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "CouponID"), SummarizeCoupon)
+dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCoupon)
+
+# dsTreatment2 <- plyr::ddply(dsProbe, c("Treatment"), summarize, M=mean(ProbeHeight))
 
 
 ############################
 ## @knitr HistogramOverlay
-g <- ggplot(ds, aes(x=ProbeHeight, y=ProportionAtHeight, color=Treatment, group=CouponID)) +
+g <- ggplot(dsSummary, aes(x=ProbeHeight, y=ProportionAtHeight, color=Treatment, group=CouponID)) +
+  geom_point(data=dsMlm, mapping=aes(x=Effect, y=.25, color=Treatment, group=NULL), shape=23, size=4, fill="white", alpha=.5, height=.05) +
   geom_point(alpha=.2) +
   geom_line(alpha=.5) +
+  geom_rug(data=dsCoupon, mapping=aes(x=MeanHeight, y=NULL), sides="r") +
   scale_y_continuous(label=scales::percent) +
   scale_color_brewer(palette="Dark2") +
   coord_flip(xlim=c(0, 75)) +
@@ -80,11 +112,17 @@ g <- ggplot(ds, aes(x=ProbeHeight, y=ProportionAtHeight, color=Treatment, group=
 g
 
 g + 
-  geom_point(data=dsTreatment, mapping=aes(x=MeanHeight, y=Inf, color=Treatment, group=NULL), hjust=2) +
-  geom_vline(data=dsTreatment, mapping=aes(xintercept=MeanHeight, color=Treatment, group=NULL)) +
+  geom_errorbarh(data=dsMlm, mapping=aes(x=Effect, xmin=CILower, xmax=CIUpper, y=.25, color=Treatment, group=NULL), size=1, alpha=.5, height=.05) +
   facet_grid(. ~ Treatment) +
   guides(color="none", fill="none") 
-  
+
+
+# g + 
+#   geom_point(data=dsTreatment, mapping=aes(x=MeanHeight, y=Inf, color=Treatment, group=NULL), hjust=2) +
+#   geom_vline(data=dsTreatment, mapping=aes(xintercept=MeanHeight, color=Treatment, group=NULL)) +
+#   facet_grid(. ~ Treatment) +
+#   guides(color="none", fill="none") 
+#   
 
 ############################
 ## @knitr CouponSummaryBoxplot

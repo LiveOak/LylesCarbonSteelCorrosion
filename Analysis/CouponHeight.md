@@ -57,10 +57,38 @@ read_chunk("./Analysis/CouponHeight.R")
 
 <!-- Tweak the datasets.   -->
 
+```
+Linear mixed model fit by REML ['lmerMod']
+Formula: ProbeHeight ~ 1 + Treatment + (1 | CouponID) 
+   Data: dsProbe 
+
+REML criterion at convergence: 917145 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ CouponID (Intercept) 48.3     6.95    
+ Residual             12.8     3.58    
+Number of obs: 170029, groups: CouponID, 68
+
+Fixed effects:
+                        Estimate Std. Error t value
+(Intercept)                6.227      2.836    2.20
+TreatmentMediaControls     0.847      3.147    0.27
+TreatmentMethane           9.476      3.865    2.45
+TreatmentSulfideAcetate    2.154      3.474    0.62
+TreatmentSulfideOnly       1.552      3.299    0.47
+
+Correlation of Fixed Effects:
+            (Intr) TrtmMC TrtmnM TrtmSA
+TrtmntMdCnt -0.901                     
+TretmntMthn -0.734  0.661              
+TrtmntSlfdA -0.816  0.736  0.599       
+TrtmntSlfdO -0.860  0.775  0.631  0.702
+```
 
 
 ## 1. Histogram Overlay
-![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay.png) 
+![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay1.png) ![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay2.png) 
 
 
 ## 2. Coupon Summary Boxplot
@@ -72,7 +100,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-12, 22:10:03 -0600
+Report created by Will at 2014-02-13, 00:03:20 -0600
 ```
 
 ```
@@ -87,11 +115,13 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] quantreg_5.05   SparseM_1.03    ggplot2_0.9.3.1 plyr_1.8.0.99   RODBC_1.3-10    knitr_1.5      
+ [1] lme4_1.0-6      Matrix_1.1-0    lattice_0.20-24 boot_1.3-9      quantreg_5.05   SparseM_1.03    ggplot2_0.9.3.1
+ [8] plyr_1.8.0.99   RODBC_1.3-10    knitr_1.5      
 
 loaded via a namespace (and not attached):
- [1] colorspace_1.2-4   dichromat_2.0-0    digest_0.6.4       evaluate_0.5.1     formatR_0.10       grid_3.1.0        
- [7] gtable_0.1.2       labeling_0.2       MASS_7.3-29        munsell_0.4.2      proto_0.3-10       RColorBrewer_1.0-5
-[13] Rcpp_0.11.0        reshape2_1.2.2     scales_0.2.3       stringr_0.6.2      tools_3.1.0       
+ [1] abind_1.4-0        arm_1.6-10         coda_0.16-1        colorspace_1.2-4   dichromat_2.0-0    digest_0.6.4      
+ [7] evaluate_0.5.1     formatR_0.10       grid_3.1.0         gtable_0.1.2       labeling_0.2       MASS_7.3-29       
+[13] minqa_1.2.3        munsell_0.4.2      nlme_3.1-113       proto_0.3-10       RColorBrewer_1.0-5 Rcpp_0.11.0       
+[19] reshape2_1.2.2     scales_0.2.3       splines_3.1.0      stringr_0.6.2      tools_3.1.0       
 ```
 
