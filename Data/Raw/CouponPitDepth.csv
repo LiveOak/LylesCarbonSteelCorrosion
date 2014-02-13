@@ -1,4 +1,4 @@
-Treatment,CouponID,ProbeHeight,PercentageAtHeight
+Treatment,CouponID,ProbeDepth,PercentageAtDepth
 SulfideOnly,1,0,0
 SulfideOnly,1,2.2248,0.00990717
 SulfideOnly,1,4.4496,0.0120087

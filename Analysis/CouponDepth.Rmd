@@ -1,6 +1,6 @@
-SMPY Descriptives
+Coupon Depth
 =================================================
-This report summarizes the NLSY79 Gen1 variables that correspond to the health items in the SMPY.
+This report summarizes the pit depths in the coupons exposed to different treatment media.
 
 <!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of only one directory.-->
 ```{r, echo=TRUE, message=F} 
@@ -35,7 +35,7 @@ opts_chunk$set(
 
 echoChunks <- FALSE
 options(width=120) #So the output is 50% wider than the default.
-read_chunk("./Analysis/CouponHeight.R") 
+read_chunk("./Analysis/CouponDepth.R") 
 ```
 <!-- Load the packages.  Suppress the output when loading packages. --> 
 ```{r LoadPackages, echo=echoChunks, message=FALSE}

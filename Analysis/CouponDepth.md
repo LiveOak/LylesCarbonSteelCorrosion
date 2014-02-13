@@ -1,6 +1,6 @@
-SMPY Descriptives
+Coupon Depth
 =================================================
-This report summarizes the NLSY79 Gen1 variables that correspond to the health items in the SMPY.
+This report summarizes the pit depths in the coupons exposed to different treatment media.
 
 <!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of only one directory.-->
 
@@ -36,7 +36,7 @@ opts_chunk$set(results = "show", comment = NA, tidy = FALSE, dpi = 100, fig.widt
 
 echoChunks <- FALSE
 options(width = 120)  #So the output is 50% wider than the default.
-read_chunk("./Analysis/CouponHeight.R")
+read_chunk("./Analysis/CouponDepth.R")
 ```
 
 <!-- Load the packages.  Suppress the output when loading packages. --> 
@@ -59,7 +59,7 @@ read_chunk("./Analysis/CouponHeight.R")
 
 ```
 Linear mixed model fit by REML ['lmerMod']
-Formula: ProbeHeight ~ 1 + Treatment + (1 | CouponID) 
+Formula: ProbeDepth ~ 1 + Treatment + (1 | CouponID) 
    Data: dsProbe 
 
 REML criterion at convergence: 917145 
@@ -100,7 +100,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-13, 00:03:20 -0600
+Report created by Will at 2014-02-13, 10:03:50 -0600
 ```
 
 ```
