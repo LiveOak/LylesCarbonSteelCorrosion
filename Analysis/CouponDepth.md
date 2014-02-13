@@ -41,26 +41,51 @@ read_chunk("./Analysis/CouponDepth.R")
 
 <!-- Tweak the datasets.   -->
 
+```
+
+Call:
+lm(formula = ProbeDepth ~ 1 + Treatment, data = dsSummary, weights = ProportionAtDepth)
+
+Weighted Residuals:
+   Min     1Q Median     3Q    Max 
+-3.197 -0.458 -0.134  0.093  1.986 
+
+Coefficients:
+                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)              -6.2064     0.1304  -47.59   <2e-16 ***
+TreatmentAcetateOnly     -0.0155     0.2916   -0.05     0.96    
+TreatmentMethane         -0.8064     0.3141   -2.57     0.01 *  
+TreatmentSulfideAcetate  -2.1770     0.2259   -9.64   <2e-16 ***
+TreatmentSulfideOnly      0.3084     0.2062    1.50     0.13    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.639 on 2477 degrees of freedom
+Multiple R-squared:  0.0484,	Adjusted R-squared:  0.0469 
+F-statistic: 31.5 on 4 and 2477 DF,  p-value: <2e-16
+```
 
 
 ## 1. Histogram Overlay
-The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The tciks on the right side indicate a *coupon's* mean depth.
+The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The ticks on the right side indicate a *coupon's* mean depth.
 
 The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a multilevel model, shown below.
 
-The four coupons processed by Conoco-Phillips's machine are *excluded* from these two graphs.
+The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by Conoco-Phillips's machine, and one suspicious control coupon).  
+
+The diamonds/means for `AcetateOnly` and `MediaControls` are on top of each other.
 
 ![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay1.png) ![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay2.png) 
 
 
 ## 2. Coupon Summary Boxplot
-The first boxplot shows all points; the four coupons processed on Conoco-Phillips machine are marked with an 'X'.  The second boxplot excludes those four coupons; notice the scale of the *y*-axis has changed.
+The first boxplot shows all points; the four coupons processed on Conoco-Phillips machine are marked with an 'X'.  Another suspicious coupon (in `MediaControls`) is marked with a triangle.  The second boxplot excludes those five coupons; notice the scale of the *y*-axis has changed.
 
 ![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot1.png) ![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot2.png) 
 
 
 ## 3. Estimates from MLM (multilevel model)
-The four coupons processed by Conoco-Phillips's machine are *excluded* from these two graphs.
+The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by Conoco-Phillips's machine, and one suspicious control coupon).
 
 Model, with treatment coefficients expressed as offsets.
 
@@ -70,41 +95,41 @@ Linear mixed model fit by REML ['lmerMod']
 Formula: ProbeDepth ~ 1 + Treatment + (1 | CouponID) 
    Data: dsProbe 
 
-REML criterion at convergence: 829914 
+REML criterion at convergence: 815751 
 
 Random effects:
  Groups   Name        Variance Std.Dev.
- CouponID (Intercept) 11.5     3.40    
- Residual             10.4     3.23    
-Number of obs: 160032, groups: CouponID, 64
+ CouponID (Intercept)  6.15    2.48    
+ Residual             10.36    3.22    
+Number of obs: 157532, groups: CouponID, 63
 
 Fixed effects:
                         Estimate Std. Error t value
-(Intercept)               -6.227      1.387   -4.49
-TreatmentMediaControls    -0.714      1.544   -0.46
-TreatmentMethane          -0.780      2.057   -0.38
-TreatmentSulfideAcetate   -2.154      1.698   -1.27
-TreatmentSulfideOnly       0.331      1.626    0.20
+(Intercept)              -6.2063     0.5063  -12.26
+TreatmentAcetateOnly     -0.0212     1.1322   -0.02
+TreatmentMethane         -0.8009     1.2194   -0.66
+TreatmentSulfideAcetate  -2.1753     0.8770   -2.48
+TreatmentSulfideOnly      0.3103     0.8006    0.39
 
 Correlation of Fixed Effects:
-            (Intr) TrtmMC TrtmnM TrtmSA
-TrtmntMdCnt -0.898                     
-TretmntMthn -0.674  0.605              
-TrtmntSlfdA -0.816  0.733  0.550       
-TrtmntSlfdO -0.853  0.766  0.575  0.696
+            (Intr) TrtmAO TrtmnM TrtmSA
+TrtmntActtO -0.447                     
+TretmntMthn -0.415  0.186              
+TrtmntSlfdA -0.577  0.258  0.240       
+TrtmntSlfdO -0.632  0.283  0.263  0.365
 ```
 
 
 Model, with treatment coefficients expressed as offsets.
 
 
-|id                       |  Effect|     SE|Treatment       |  CILower|  CIUpper|
-|:------------------------|-------:|------:|:---------------|--------:|--------:|
-|TreatmentAcetateOnly     |  -6.222|  1.387|AcetateOnly     |   -7.609|   -4.835|
-|TreatmentMediaControls   |  -6.941|  1.544|MediaControls   |   -8.486|   -5.397|
-|TreatmentMethane         |  -7.013|  2.057|Methane         |   -9.070|   -4.956|
-|TreatmentSulfideAcetate  |  -8.383|  1.698|SulfideAcetate  |  -10.082|   -6.685|
-|TreatmentSulfideOnly     |  -5.898|  1.626|SulfideOnly     |   -7.524|   -4.272|
+|id                       |  Effect|      SE|Treatment       |  CILower|  CIUpper|
+|:------------------------|-------:|-------:|:---------------|--------:|--------:|
+|TreatmentMediaControls   |  -6.206|  0.5063|MediaControls   |   -6.713|   -5.700|
+|TreatmentAcetateOnly     |  -6.222|  1.1322|AcetateOnly     |   -7.354|   -5.090|
+|TreatmentMethane         |  -7.013|  1.2194|Methane         |   -8.232|   -5.793|
+|TreatmentSulfideAcetate  |  -8.383|  0.8770|SulfideAcetate  |   -9.260|   -7.506|
+|TreatmentSulfideOnly     |  -5.898|  0.8006|SulfideOnly     |   -6.699|   -5.097|
 
 
 
@@ -113,7 +138,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-13, 11:18:00 -0600
+Report created by Will at 2014-02-13, 13:05:47 -0600
 ```
 
 ```

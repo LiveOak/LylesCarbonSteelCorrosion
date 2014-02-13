@@ -47,23 +47,25 @@ read_chunk("./Analysis/CouponDepth.R")
 ```
 
 ## 1. Histogram Overlay
-The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The tciks on the right side indicate a *coupon's* mean depth.
+The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The ticks on the right side indicate a *coupon's* mean depth.
 
 The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a multilevel model, shown below.
 
-The four coupons processed by Conoco-Phillips's machine are *excluded* from these two graphs.
+The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by Conoco-Phillips's machine, and one suspicious control coupon).  
+
+The diamonds/means for `AcetateOnly` and `MediaControls` are on top of each other.
 
 ```{r HistogramOverlay, echo=echoChunks, results='asis', message=TRUE, fig.height = 10}
 ```
 
 ## 2. Coupon Summary Boxplot
-The first boxplot shows all points; the four coupons processed on Conoco-Phillips machine are marked with an 'X'.  The second boxplot excludes those four coupons; notice the scale of the *y*-axis has changed.
+The first boxplot shows all points; the four coupons processed on Conoco-Phillips machine are marked with an 'X'.  Another suspicious coupon (in `MediaControls`) is marked with a triangle.  The second boxplot excludes those five coupons; notice the scale of the *y*-axis has changed.
 
 ```{r CouponSummaryBoxplot, echo=echoChunks, results='asis', message=TRUE}
 ```
 
 ## 3. Estimates from MLM (multilevel model)
-The four coupons processed by Conoco-Phillips's machine are *excluded* from these two graphs.
+The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by Conoco-Phillips's machine, and one suspicious control coupon).
 
 Model, with treatment coefficients expressed as offsets.
 
