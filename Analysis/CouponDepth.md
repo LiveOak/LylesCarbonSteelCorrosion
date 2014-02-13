@@ -5,34 +5,18 @@ This report summarizes the pit depths in the coupons exposed to different treatm
 <!--  Set the working directory to the repository's base directory; this assumes the report is nested inside of only one directory.-->
 
 ```r
-# cat('Working directory: ', getwd())
-
-# if( basename(getwd()) == 'Analysis' ) {
 opts_knit$set(root.dir = "../")  #Don't combine this call with any other chunk -especially one that uses file paths.
-# }
 ```
 
 
 <!-- Set the report-wide options, and point to the external code file. -->
 
 ```r
-# pathInput <- './Data/Raw/CouponPitDepth.csv' ds <- read.csv(pathInput,
-# stringsAsFactors=FALSE) str(ds)
-
-cat("Working directory: ", getwd())
-```
-
-```
-## Working directory:  D:/Users/Will/Documents/GitHub/LylesCarbonSteelCorrosion
-```
-
-```r
 require(knitr)
 opts_chunk$set(results = "show", comment = NA, tidy = FALSE, dpi = 100, fig.width = 6.5, 
     fig.height = 4, fig.path = "figure_raw/")
-# dev = 'png'#, dpi = 400 dpi = 100 out.width = '600px', #This affects only
-# the markdown, not the underlying png file.  The height will be scaled
-# appropriately.
+# dpi = 400 out.width = '600px', #This affects only the markdown, not the
+# underlying png file.  The height will be scaled appropriately.
 
 echoChunks <- FALSE
 options(width = 120)  #So the output is 50% wider than the default.
@@ -57,42 +41,71 @@ read_chunk("./Analysis/CouponDepth.R")
 
 <!-- Tweak the datasets.   -->
 
+
+
+## 1. Histogram Overlay
+The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The tciks on the right side indicate a *coupon's* mean depth.
+
+The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a multilevel model, shown below.
+
+The four coupons processed by Conoco-Phillips's machine are *excluded* from these two graphs.
+
+![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay1.png) ![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay2.png) 
+
+
+## 2. Coupon Summary Boxplot
+The first boxplot shows all points; the four coupons processed on Conoco-Phillips machine are marked with an 'X'.  The second boxplot excludes those four coupons; notice the scale of the *y*-axis has changed.
+
+![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot1.png) ![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot2.png) 
+
+
+## 3. Estimates from MLM (multilevel model)
+The four coupons processed by Conoco-Phillips's machine are *excluded* from these two graphs.
+
+Model, with treatment coefficients expressed as offsets.
+
+
 ```
 Linear mixed model fit by REML ['lmerMod']
 Formula: ProbeDepth ~ 1 + Treatment + (1 | CouponID) 
    Data: dsProbe 
 
-REML criterion at convergence: 917145 
+REML criterion at convergence: 829914 
 
 Random effects:
  Groups   Name        Variance Std.Dev.
- CouponID (Intercept) 48.3     6.95    
- Residual             12.8     3.58    
-Number of obs: 170029, groups: CouponID, 68
+ CouponID (Intercept) 11.5     3.40    
+ Residual             10.4     3.23    
+Number of obs: 160032, groups: CouponID, 64
 
 Fixed effects:
                         Estimate Std. Error t value
-(Intercept)                6.227      2.836    2.20
-TreatmentMediaControls     0.847      3.147    0.27
-TreatmentMethane           9.476      3.865    2.45
-TreatmentSulfideAcetate    2.154      3.474    0.62
-TreatmentSulfideOnly       1.552      3.299    0.47
+(Intercept)               -6.227      1.387   -4.49
+TreatmentMediaControls    -0.714      1.544   -0.46
+TreatmentMethane          -0.780      2.057   -0.38
+TreatmentSulfideAcetate   -2.154      1.698   -1.27
+TreatmentSulfideOnly       0.331      1.626    0.20
 
 Correlation of Fixed Effects:
             (Intr) TrtmMC TrtmnM TrtmSA
-TrtmntMdCnt -0.901                     
-TretmntMthn -0.734  0.661              
-TrtmntSlfdA -0.816  0.736  0.599       
-TrtmntSlfdO -0.860  0.775  0.631  0.702
+TrtmntMdCnt -0.898                     
+TretmntMthn -0.674  0.605              
+TrtmntSlfdA -0.816  0.733  0.550       
+TrtmntSlfdO -0.853  0.766  0.575  0.696
 ```
 
 
-## 1. Histogram Overlay
-![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay1.png) ![plot of chunk HistogramOverlay](figure_raw/HistogramOverlay2.png) 
+Model, with treatment coefficients expressed as offsets.
 
 
-## 2. Coupon Summary Boxplot
-![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot.png) 
+|id                       |  Effect|     SE|Treatment       |  CILower|  CIUpper|
+|:------------------------|-------:|------:|:---------------|--------:|--------:|
+|TreatmentAcetateOnly     |  -6.222|  1.387|AcetateOnly     |   -7.609|   -4.835|
+|TreatmentMediaControls   |  -6.941|  1.544|MediaControls   |   -8.486|   -5.397|
+|TreatmentMethane         |  -7.013|  2.057|Methane         |   -9.070|   -4.956|
+|TreatmentSulfideAcetate  |  -8.383|  1.698|SulfideAcetate  |  -10.082|   -6.685|
+|TreatmentSulfideOnly     |  -5.898|  1.626|SulfideOnly     |   -7.524|   -4.272|
+
 
 
 ## Session Information
@@ -100,7 +113,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-13, 10:03:50 -0600
+Report created by Will at 2014-02-13, 11:18:00 -0600
 ```
 
 ```

@@ -8,10 +8,13 @@ require(plyr)
 require(ggplot2)
 require(quantreg)
 require(boot)
+require(knitr)
 require(lme4)
+# require(texreg) #For lme4 tables in HTML
 ############################
 ## @knitr DeclareGlobals
 pathInput <- "./Data/Raw/CouponPitDepth.csv"
+couponIDDifferentMachine <- c(1, 18, 21, 43) #These coupons were processed by Conoco Phillips with a different machine.
 
 SummarizeCoupon <- function( d ) {
   mostlyTop <- quantreg::rq(ProbeDepth ~ 1, weights=ProportionAtDepth, tau=.97, data=d)
@@ -39,29 +42,35 @@ SummarizeCoupon <- function( d ) {
 # }
 ############################
 ## @knitr LoadData
-dsSummary <- read.csv(pathInput, stringsAsFactors=FALSE)
-# summary(dsSummary)
-# sapply(dsSummary, class)
-# sapply(dsSummary, FUN=function(x){sum(is.na(x))})
+dsSummaryAll <- read.csv(pathInput, stringsAsFactors=FALSE)
+# summary(dsSummaryAll)
+# sapply(dsSummaryAll, class)
+# sapply(dsSummaryAll, FUN=function(x){sum(is.na(x))})
 ############################
 ## @knitr TweakData
-dsSummary$ID <- seq_along(dsSummary$CouponID)
-dsSummary$ProportionAtDepth <- dsSummary$PercentageAtDepth / 100
-dsSummary$Treatment <- factor(dsSummary$Treatment)
-dsSummary$CouponID <- factor(dsSummary$CouponID)
+dsSummaryAll$ProbeDepth <- -dsSummaryAll$ProbeDepth
+dsSummaryAll$CouponBinID <- seq_along(dsSummaryAll$CouponID)
+dsSummaryAll$ProportionAtDepth <- dsSummaryAll$PercentageAtDepth / 100
+dsSummaryAll$Treatment <- factor(dsSummaryAll$Treatment)
+dsSummaryAll$ConocoMachine <- (dsSummaryAll$CouponID %in% couponIDDifferentMachine)
+dsSummaryAll$CouponID <- factor(dsSummaryAll$CouponID)
+dsSummaryAll$WeightedDepth <- dsSummaryAll$ProbeDepth * dsSummaryAll$ProportionAtDepth
+#Don't use for real analysis: dsSummaryAll$WeightedDepth <- dsSummaryAll$ProbeDepth #Demo purposes: Mimic if the hisotgram heights were ignored
+
+dsSummary <- dsSummaryAll[!dsSummaryAll$ConocoMachine, ]
 
 ExpandSummary <- function( d ) {
   probeCount <- round(d$ProportionAtDepth * 2501)
   data.frame(
     Treatment = rep(d$Treatment, each=probeCount),
     CouponID = rep(d$CouponID, each=probeCount),
+    ConocoMachine = rep(d$ConocoMachine, each=probeCount),
     ProbeDepth = rep(d$ProbeDepth, each=probeCount)
   )
 }
-dsProbe <- plyr::ddply(dsSummary, .variables="ID", ExpandSummary)
+dsProbe <- plyr::ddply(dsSummary, .variables="CouponBinID", ExpandSummary)
 # ds$PercentageAtDepth * 2501
 
-dsSummary$WeightedDepth <- dsSummary$ProbeDepth * dsSummary$ProportionAtDepth
 
 # bootSpread(scores=ds$ProbeDepth, weights=round(2500*ds$ProportionAtDepth))
 
@@ -72,7 +81,7 @@ dsSummary$WeightedDepth <- dsSummary$ProbeDepth * dsSummary$ProportionAtDepth
 # summary(lm(ProbeDepth ~ 1 + Treatment, data=ds, weights=ProportionAtDepth))
 # 
 m <- lmer(ProbeDepth ~ 1 + Treatment + (1|CouponID), data=dsProbe)
-summary(m)
+# summary(m)
 seFixedEffects <- arm::se.fixef(m)
 
 # m <-lmer(ProbeDepth ~ 1 + Treatment + (1|CouponID), data=dsSummary, weights=ProportionAtDepth)
@@ -85,11 +94,13 @@ dsMlm <- data.frame(Effect=fixef(m0), SE=seFixedEffects)
 dsMlm$Treatment <- gsub("(Treatment)", replacement="", rownames(dsMlm), perl=TRUE);
 dsMlm$CILower <- dsMlm$Effect - dsMlm$SE
 dsMlm$CIUpper <- dsMlm$Effect + dsMlm$SE
+# rownames(dsMlm) <- seq_along(rownames(dsMlm))
 
 # grep("(?<=Treatment)(\\w+)\\b", names(f), perl=TRUE, value=TRUE);
 # gsub("Treatment(\\w+)", replacement="\\2", names(f), perl=TRUE);
   
-dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "CouponID"), SummarizeCoupon)
+dsCouponAll <- plyr::ddply(dsSummaryAll, c("Treatment", "CouponID", "ConocoMachine"), SummarizeCoupon)
+dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "CouponID", "ConocoMachine"), SummarizeCoupon)
 dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCoupon)
 
 # dsTreatment2 <- plyr::ddply(dsProbe, c("Treatment"), summarize, M=mean(ProbeDepth))
@@ -104,9 +115,9 @@ g <- ggplot(dsSummary, aes(x=ProbeDepth, y=ProportionAtDepth, color=Treatment, g
   geom_rug(data=dsCoupon, mapping=aes(x=MeanDepth, y=NULL), sides="r") +
   scale_y_continuous(label=scales::percent) +
   scale_color_brewer(palette="Dark2") +
-  coord_flip(xlim=c(0, 75)) +
+  coord_flip(xlim=c(-35, 0)) +
   theme_bw() +
-  theme(legend.position=c(1,1), legend.justification=c(1,1)) +
+  theme(legend.position=c(1,0), legend.justification=c(1,0)) +
   guides(colour=guide_legend(override.aes=list(alpha=1, size=5))) +
   labs(x=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)), y="Percent of Coupon's Probes at Depth")
 g
@@ -127,17 +138,30 @@ g +
 ############################
 ## @knitr CouponSummaryBoxplot
 set.seed(seed=9789) #Set a seed so the jittered graphs are consistent across renders.
-ggplot(dsCoupon, aes(x=Treatment, y=MeanDepth, color=Treatment, fill=Treatment)) +
-  geom_boxplot(outlier.colour=NA, alpha=.1) +
+gBox <- ggplot(dsCouponAll, aes(x=Treatment, y=MeanDepth, color=Treatment, fill=Treatment, shape=ConocoMachine)) +
+  geom_point(position=position_jitter(w = 0.2, h = 0), size=5, alpha=.5) +
+  geom_boxplot(mapping=aes(shape=NULL), outlier.colour=NA, alpha=.1) +
   stat_summary(fun.y="mean", geom="point", shape=23, size=8, fill="white", na.rm=T) + #See Chang (2013), Recipe 6.8.
-  geom_point(position=position_jitter(w = 0.2, h = 0), shape=1, size=5, alpha=.5) +
   scale_color_brewer(palette="Dark2") +
   scale_fill_brewer(palette="Dark2") +
+  scale_shape_manual(values=c("TRUE"=4, "FALSE"=1)) +
   theme_bw() +
-  guides(color="none", fill="none") +
+  guides(color="none", fill="none", shape="none") +
   labs(y=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)))
+gBox
 
+set.seed(seed=9789) #Set a seed so the jittered graphs are consistent across renders.
+gBox %+% dsCoupon
 
 ############################
-## @knitr AnalysisChunk03
+## @knitr MlmEstimates
+summary(m)
+
+############################
+## @knitr MlmCoefficients
+cat("\n\n")
+kable(dsMlm)
+cat("\n\n")
+# h <- htmlreg(m)
+# h
 
