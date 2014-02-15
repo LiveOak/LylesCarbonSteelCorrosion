@@ -19,17 +19,82 @@ opts_chunk$set(results = "show", comment = NA, tidy = FALSE, dpi = 100, fig.widt
 # dpi = 400 out.width = '600px', #This affects only the markdown, not the
 # underlying png file.  The height will be scaled appropriately.
 
-echoChunks <- FALSE
+echoChunks <- TRUE
 options(width = 120)  #Widen the default text output by 50%  more characters..
 read_chunk("./Analysis/CouponDepth.R")
 ```
 
 <!-- Load the packages.  Suppress the output when loading packages. --> 
 
+```r
+require(knitr) #For literate programming
+require(testit) #For convenient asserts
+require(RColorBrewer) #For the color palettes
+require(plyr) #For manipulating datsets
+require(grid) #For graphing
+require(gridExtra) #For graphing
+require(ggplot2) #For graphing
+require(boot) #For bootstrapped CIs
+require(lme4) #For multilevel modeling (MLM)
+require(arm) #For manipulating MLM standard errors
+require(MCMCglmm)
+# require(quantreg) #For quantile regression
+
+############################
+```
 
 
 <!-- Load any Global functions and variables declared in the R file.  Suppress the output. --> 
 
+```r
+pathInputSummaryBinAll <- "./Data/Derived/SummaryBinAll.rds"
+pathInputProbeAll <- "./Data/Derived/ProbeAll.rds"
+pathMcmcResults <-  "./Code/EstimateMlmMcmc/mcmcMlmResults.RData"
+
+
+bootSpread <- function( scores, weights=NULL, conf=.68 ) {
+  plugin <- function( d, i ) { mean(d[i]) }  
+  distribution <- boot(data=scores, plugin, weights=weights, R=99)
+  
+  # I'm using the percentile instead of the BCa, because the acceleration can't be estimated with these scores and weights for some reason.  I'm not using them in the real anlaysis anyway.
+  ci <- boot.ci(distribution, type = c("perc"), conf=conf)
+  return( ci$percent[4:5] )
+}
+
+SummarizeCorrosion <- function( d ) {  
+  weightedModel <- lm(ProbeDepth ~ 1, data=d, weights=ProportionAtDepth)
+  
+  meanV1 <- sum(d$ProbeDepth * d$ProportionAtDepth) / sum(d$ProportionAtDepth)
+  meanV2 <- coef(summary(weightedModel))["(Intercept)", "Estimate"]
+  se <- coef(summary(weightedModel))["(Intercept)", "Std. Error"]  
+  parametricCI <- meanV2 + c(-1, 1) * se
+  
+  bootCI <- bootSpread(scores=d$ProbeDepth, weights=dsSummaryAll$ProportionAtDepth)
+  data.frame(
+    Top = max(d$ProbeDepth),
+    MeanDepth = meanV1,
+    MeanDepthV2 = meanV2,
+    Bottom = min(d$ProbeDepth),
+    ParametricSELower = parametricCI[1],
+    ParametricSEUpper = parametricCI[2],
+    BootSELower = bootCI[1],
+    BootSEUpper = bootCI[2],
+    BinCount = length(d$ProbeDepth)
+  )
+}
+
+reportTheme <- theme_bw() +
+  theme(axis.text = element_text(colour="gray40")) +
+  theme(axis.title = element_text(colour="gray40")) +
+  theme(panel.border = element_rect(colour="gray80")) +
+  theme(axis.ticks = element_blank()) +
+  theme(legend.text = element_text(colour="gray40")) +
+  theme(legend.background = element_blank()) +
+  theme(legend.key = element_blank()) +
+  theme(legend.position=c(1,0), legend.justification=c(1,0))
+
+############################
+```
 
 
 <!-- Declare any global functions specific to a Rmd output.  Suppress the output. --> 
@@ -38,9 +103,56 @@ read_chunk("./Analysis/CouponDepth.R")
 
 <!-- Load the datasets.   -->
 
+```r
+dsSummaryAll <- readRDS(pathInputSummaryBinAll)
+dsProbeAll <- readRDS(pathInputProbeAll)
+mcmcResultsAllChains <- load(pathMcmcResults)
+
+############################
+```
 
 
 <!-- Tweak the datasets.   -->
+
+```r
+###
+### Syncronize factor levels with aspects of graphing.
+###
+#For outliers
+outlierLevels <- levels(dsSummaryAll$OutlierStatus)
+shapeOutlier <- c(21, 24, 25)
+testit::assert("The number of `OutlierStatus` levels should equal the number of assigned shapes (for plotting)", length(outlierLevels)==length(shapeOutlier))
+names(shapeOutlier) <- outlierLevels
+#For treatments
+
+treatmentLevels <- levels(dsSummaryAll$Treatment)
+treatmentLabelsLine <- gsub("\\B([A-Z])", "\n\\1", treatmentLevels, perl=TRUE);
+treatmentLabelsSpace <- gsub("\\B([A-Z])", " \\1", treatmentLevels, perl=TRUE);
+dsSummaryAll$TreatmentPretty <- factor(dsSummaryAll$Treatment, levels=treatmentLevels, labels=treatmentLabelsSpace)
+
+testit::assert("The number of `Treatment` levels should equal the expected number of 5 (for plotting colors)", length(treatmentLevels)==5L)
+treatmentPalette <- RColorBrewer::brewer.pal(n=length(treatmentLevels), name="Dark2")[c(2,1,3,4,5)]
+#names(treatmentPalette) <- treatmentLevels
+names(treatmentPalette) <- treatmentLabelsSpace
+treatmentPaletteLight <- adjustcolor(treatmentPalette, alpha.f=.2)
+
+
+###
+### Exclude the outliers from the main datasets
+###
+dsSummary <- dsSummaryAll[dsSummaryAll$OutlierStatus == "Normal", ]
+dsProbe <- dsProbeAll[dsProbeAll$OutlierStatus == "Normal", ]
+
+#Examine individual treatments closely: dsSummary <- dsSummaryAll[dsSummaryAll$Treatment=="MediaControls", ] 
+#Examine individual coupons closely: dsSummary <- dsSummaryAll[dsSummaryAll$CouponID==31, ] 
+
+###
+### Derive datasets where each record represents a coupon/treatment.
+###
+dsCouponAll <- plyr::ddply(dsSummaryAll, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
+dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
+dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion) #There will be six warning messages immediately below because the coupon weights aren't what hte bootstrap expects.
+```
 
 ```
 Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [984]
@@ -49,6 +161,42 @@ Warning: data length [2788] is not a sub-multiple or multiple of the number of r
 Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [205]
 Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [492]
 Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [656]
+```
+
+```r
+#Double-check ddply call above that uses weights: dsTreatment2 <- plyr::ddply(dsProbe, c("Treatment"), summarize, M=mean(ProbeDepth))
+
+dsCouponAll <- dsCouponAll[order(dsCouponAll$OutlierStatus, dsCouponAll$CouponID, decreasing=F), ] #Sort so the jitter isn't affected when the outliers are removed
+dsCoupon <- dsCoupon[order(dsCoupon$OutlierStatus, dsCoupon$CouponID, decreasing=F), ] #Sort so the jitter isn't affected when the outliers are removed
+###
+### Estimate the MLM coefficients
+###
+coefficients <- mcmcMlmCondensed$statistics[, "Mean"]
+
+#Remember that the SD of the chain is equivalent to the SE of the parameter.
+dsMlm <- data.frame(Treatment = NA_character_,
+                    Effect = coefficients, 
+                    SE = mcmcMlmCondensed$statistics[, "SD"],
+                    SELower = mcmcMlmCondensed$quantiles[, "15.87%"],
+                    SEUpper = mcmcMlmCondensed$quantiles[, "84.13%"]
+                    )
+dsMlm$Coefficient <- dsMlm$Effect
+dsMlm[2:5, c("Effect", "SELower", "SEUpper")] <- dsMlm$Effect[1] + dsMlm[2:5, c("Effect", "SELower", "SEUpper")]
+
+rownames(dsMlm)[rownames(dsMlm)=="(Intercept)"] <- "TreatmentMediaControls"
+dsMlm$Treatment <- gsub("(Treatment)", replacement="", rownames(dsMlm), perl=TRUE)
+dsMlm$Treatment <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=treatmentLevels)
+dsMlm$TreatmentPretty <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=treatmentLabelsSpace)
+# dsMlm
+
+# grep("(?<=Treatment)(\\w+)", rownames(dsMlm), perl=TRUE, value=T);
+# regmatches(rownames(dsMlm), regexpr("(?<=Treatment)(\\w+)", rownames(dsMlm), perl=TRUE));
+
+# bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$ProportionAtDepth)
+# bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$PercentageAtDepth)
+# bootSpread(scores=dsProbe$ProbeDepth)
+
+############################
 ```
 
 
@@ -69,7 +217,37 @@ The diamonds/means for `AcetateOnly` and `MediaControls` are on top of each othe
 ## 2. Coupon Summary Boxplot
 The first boxplot shows all points; the four coupons processed on ConocoPhillips machine are marked with a regular triangle.  Another suspicious coupon (in `MediaControls`) is marked with an upside-down triangle.  The second boxplot excludes those five coupons; notice the scale of the *y*-axis has changed.
 
+
+```r
+set.seed(seed=9789) #Set a seed so the jittered graphs are consistent across renders.
+gBoxAll <- ggplot(dsCouponAll, aes(x=TreatmentPretty, y=MeanDepth, color=TreatmentPretty, fill=TreatmentPretty, shape=OutlierStatus, label=CouponID)) +
+#   geom_text(position=position_jitter(w = 0.2, h = 0), size=5, alpha=.5) +
+  geom_boxplot(mapping=aes(shape=NULL), outlier.colour=NA, alpha=.1) +
+  stat_summary(fun.y="mean", geom="point", shape=23, size=8, fill="white", na.rm=T) + #See Chang (2013), Recipe 6.8.
+  geom_point(position=position_jitter(w = 0.2, h = 0), size=5) +
+  scale_x_discrete(labels=treatmentLabelsLine) +
+  scale_color_manual(values=treatmentPalette) +
+  scale_fill_manual(values=treatmentPaletteLight) +
+  scale_shape_manual(values=shapeOutlier) +
+  reportTheme +
+  guides(color="none", fill="none", shape="none") +
+  labs(title="Includes Five Outliers", x=NULL, y=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)))
+# gBoxAll
+
+set.seed(seed=9789) #Set a seed so the jittered graphs are consistent across renders.
+gBoxMost <- gBoxAll %+% 
+  dsCoupon +
+  labs(title="Excludes Five Outliers", y="")
+
+gridExtra::grid.arrange(gBoxAll, gBoxMost, ncol=2, sub="Treatment")
+```
+
 ![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot.png) 
+
+```r
+
+############################
+```
 
 
 ## 3. Estimates from MLM (multilevel model) to Test Hypotheses
@@ -77,6 +255,81 @@ The five outlier coupons are *excluded* from these two graphs (*ie*, the four pr
 
 Model, with treatment coefficients expressed as offsets.
 
+
+```
+
+ Iterations = 251:1000
+ Thinning interval  = 1
+ Sample size  = 750 
+
+ DIC: 815367 
+
+ G-structure:  ~CouponID
+
+         post.mean l-95% CI u-95% CI eff.samp
+CouponID      6.35     4.26     8.61      601
+
+ R-structure:  ~units
+
+      post.mean l-95% CI u-95% CI eff.samp
+units      10.4     10.3     10.4      750
+
+ Location effects: ProbeDepth ~ 1 + Treatment 
+
+                        post.mean l-95% CI u-95% CI eff.samp  pMCMC   
+(Intercept)               -6.1928  -7.1613  -5.1435      750 <0.001 **
+TreatmentAcetateOnly      -0.0329  -2.3283   2.1307      750  0.973   
+TreatmentMethane          -0.8871  -3.6244   1.4970      750  0.509   
+TreatmentSulfideAcetate   -2.1877  -4.2826  -0.6954      750  0.035 * 
+TreatmentSulfideOnly       0.2686  -1.2866   1.8113      750  0.709   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```
+                            Mean     SD Naive SE Time-series SE
+(Intercept)             -6.19601 0.5149 0.009401       0.009559
+TreatmentAcetateOnly    -0.03486 1.1384 0.020784       0.020257
+TreatmentMethane        -0.83032 1.2386 0.022613       0.022615
+TreatmentSulfideAcetate -2.18762 0.9020 0.016468       0.017225
+TreatmentSulfideOnly     0.30321 0.8137 0.014855       0.014858
+```
+
+```
+                          2.5%  15.87%     25%      50%      75%  84.13%   97.5%
+(Intercept)             -7.224 -6.6966 -6.5304 -6.20205 -5.86771 -5.7066 -5.1688
+TreatmentAcetateOnly    -2.323 -1.1423 -0.7866 -0.05641  0.73164  1.0960  2.1736
+TreatmentMethane        -3.294 -2.0696 -1.6432 -0.82152 -0.01766  0.3952  1.6592
+TreatmentSulfideAcetate -3.953 -3.0885 -2.7804 -2.17869 -1.59340 -1.3069 -0.4072
+TreatmentSulfideOnly    -1.287 -0.5138 -0.2619  0.30761  0.84050  1.1116  1.8999
+```
+
+
+Model, with treatment coefficients expressed as offsets.
+
+
+|id                       |Treatment       |  Effect|      SE|  SELower|  SEUpper|  Coefficient|TreatmentPretty  |
+|:------------------------|:---------------|-------:|-------:|--------:|--------:|------------:|:----------------|
+|TreatmentMediaControls   |MediaControls   |  -6.196|  0.5149|   -6.697|   -5.707|     -6.19601|Media Controls   |
+|TreatmentAcetateOnly     |AcetateOnly     |  -6.231|  1.1384|   -7.338|   -5.100|     -0.03486|Acetate Only     |
+|TreatmentMethane         |Methane         |  -7.026|  1.2386|   -8.266|   -5.801|     -0.83032|Methane          |
+|TreatmentSulfideAcetate  |SulfideAcetate  |  -8.384|  0.9020|   -9.284|   -7.503|     -2.18762|Sulfide Acetate  |
+|TreatmentSulfideOnly     |SulfideOnly     |  -5.893|  0.8137|   -6.710|   -5.084|      0.30321|Sulfide Only     |
+
+
+## 4. Other Models (NOT to be used to Test Hypotheses)
+These models are mostly to check the validity & bounds for the MLM estimates in the previous section.  Notice the point estimates for each treatment are very similar (to each other and to the previous MLM).  But the standard errors and *p*-values are very different for the 'no pooling' model, and would lead to different conclusions.  The results for the MLM and pooled
+
+
+```r
+### 
+### This single-level model most closely resembles the reported MLM, and closely supports the MLM results.
+### Instead of considering *each probe* on a coupon (which the MLM does), it considers only the mean of a coupon.
+### 
+#The MLM that estimates an intercept for the controls, and then offsets for the four treatments.
+mFrequentist <- lmer(ProbeDepth ~ 1 + Treatment + (1 | CouponID), data=dsProbe) #
+summary(mFrequentist) # fixef(mFrequentist) # ranef(mFrequentist) #seFixedEffects <- arm::se.fixef(mFrequentist)
+```
 
 ```
 Linear mixed model fit by REML ['lmerMod']
@@ -107,25 +360,12 @@ TrtmntSlfdA -0.577  0.258  0.240
 TrtmntSlfdO -0.632  0.283  0.263  0.365
 ```
 
-
-Model, with treatment coefficients expressed as offsets.
-
-
-|id                       |  Effect|      SE|Treatment       |TreatmentPretty  |  SELower|  SEUpper|
-|:------------------------|-------:|-------:|:---------------|:----------------|--------:|--------:|
-|TreatmentMediaControls   |  -6.206|  0.5063|MediaControls   |Media Controls   |   -6.713|   -5.700|
-|TreatmentAcetateOnly     |  -6.222|  1.1322|AcetateOnly     |Acetate Only     |   -7.354|   -5.090|
-|TreatmentMethane         |  -7.013|  1.2194|Methane         |Methane          |   -8.232|   -5.793|
-|TreatmentSulfideAcetate  |  -8.383|  0.8770|SulfideAcetate  |Sulfide Acetate  |   -9.260|   -7.506|
-|TreatmentSulfideOnly     |  -5.898|  0.8006|SulfideOnly     |Sulfide Only     |   -6.699|   -5.097|
-
-
-
-## 4. Other Models (NOT to be used to Test Hypotheses)
-These models are mostly to check the validity & bounds for the MLM estimates in the previous section.  Notice the point estimates for each treatment are very similar (to each other and to the previous MLM).  But the standard errors and *p*-values are very different for the 'no pooling' model, and would lead to different conclusions.  The results for the MLM and pooled
-
-
 ```r
+# 
+#The MLM that estimates each treatment mean separately (the zero indicates no grand intercept).
+# mFrequentist0 <- lmer(ProbeDepth ~ 0 + Treatment + (1 | CouponID), data=dsSummary, weights=ProportionAtDepth) 
+# summary(mFrequentist0)
+
 ### 
 ### This single-level model most closely resembles the reported MLM, and closely supports the MLM results.
 ### Instead of considering *each probe* on a coupon (which the MLM does), it considers only the mean of a coupon.
@@ -217,15 +457,7 @@ anova(m, mNoTreatmentMlm)
 ```
 
 ```
-Data: dsProbe
-Models:
-mNoTreatmentMlm: ProbeDepth ~ 1 + (1 | CouponID)
-m: ProbeDepth ~ 1 + Treatment + (1 | CouponID)
-                Df    AIC    BIC  logLik deviance Chisq Chi Df Pr(>Chisq)  
-mNoTreatmentMlm  3 815771 815801 -407883   815765                          
-m                7 815771 815841 -407879   815757  8.48      4      0.076 .
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Error: object 'm' not found
 ```
 
 ```r
@@ -380,7 +612,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-14, 21:40:31 -0600
+Report created by Will at 2014-02-15, 01:10:17 -0600
 ```
 
 ```
@@ -395,13 +627,13 @@ attached base packages:
 [1] grid      stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] arm_1.6-10         MASS_7.3-29        lme4_1.0-6         Matrix_1.1-0       lattice_0.20-24    boot_1.3-9        
- [7] ggplot2_0.9.3.1    gridExtra_0.9.1    plyr_1.8.0.99      RColorBrewer_1.0-5 testit_0.3         knitr_1.5         
+ [1] MCMCglmm_2.17      corpcor_1.6.6      ape_3.0-11         coda_0.16-1        tensorA_0.36       arm_1.6-10        
+ [7] MASS_7.3-29        lme4_1.0-6         Matrix_1.1-0       lattice_0.20-24    boot_1.3-9         ggplot2_0.9.3.1   
+[13] gridExtra_0.9.1    plyr_1.8.0.99      RColorBrewer_1.0-5 testit_0.3         knitr_1.5         
 
 loaded via a namespace (and not attached):
- [1] abind_1.4-0      coda_0.16-1      colorspace_1.2-4 dichromat_2.0-0  digest_0.6.4     evaluate_0.5.1  
- [7] formatR_0.10     gtable_0.1.2     labeling_0.2     minqa_1.2.3      munsell_0.4.2    nlme_3.1-113    
-[13] proto_0.3-10     Rcpp_0.11.0      reshape2_1.2.2   scales_0.2.3     splines_3.1.0    stringr_0.6.2   
-[19] tools_3.1.0     
+ [1] abind_1.4-0      colorspace_1.2-4 dichromat_2.0-0  digest_0.6.4     evaluate_0.5.1   formatR_0.10    
+ [7] gtable_0.1.2     labeling_0.2     minqa_1.2.3      munsell_0.4.2    nlme_3.1-113     proto_0.3-10    
+[13] Rcpp_0.11.0      reshape2_1.2.2   scales_0.2.3     splines_3.1.0    stringr_0.6.2    tools_3.1.0     
 ```
 

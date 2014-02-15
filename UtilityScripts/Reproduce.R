@@ -43,6 +43,7 @@ pathDerivedProbeAll <- "./Data/Derived/ProbeAll.rds"
 
 # Code Files:
 pathAugment <- "./Code/AugmentData.R"
+pathMcmc <- "./EstimateMlmMcmc/EstimateMlmMcmc.R"
 pathAnalysis <- "./Analysis/CouponDepth.R"
 
 #Report Files:
@@ -56,6 +57,7 @@ testit::assert("The profilometer data should exist.", base::file.exists(pathInpu
 
 # Code Files:
 testit::assert("The file that restructures the data should exist.", base::file.exists(pathAugment))
+testit::assert("The file that runs the MCMC model should exist.", base::file.exists(pathMcmc))
 testit::assert("The file that analyzes all the models should exist.", base::file.exists(pathAnalysis))
 
 #Report Files:

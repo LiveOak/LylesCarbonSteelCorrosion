@@ -1,0 +1,83 @@
+<!-- Specify the report's official name, goal & description. -->
+# Diagnosis of Coupon Pit Depth
+
+**Report Description**: This report is more for the diagnosis of the MCMC.  The `CouponDepth` report is intended for general audiences.
+
+```{r, echo=FALSE} 
+  #Set the chunks' working directory to the repository's base directory; this assumes the report is nested inside of two directories.
+  opts_knit$set(root.dir='../../')  #Don't combine this call with any other chunk -espeically one that uses file paths.
+```
+<!-- Point knitr to the underlying code file so it knows where to look for the chunks. -->
+```{r SetOtherOptions , echo=FALSE, message=F}
+  opts_chunk$set(
+    comment="" 
+    , fig.width = 8
+    , fig.height = 10
+    , fig.path = 'FigureDiagnosisRmd/' 
+  )
+  options(width=150)
+                 
+  # require(xtable)
+  # require(scales)
+  pathSourceCode <- "./Code/EstimateMlmMcmc/EstimateMlmMcmc.R"
+  read_chunk(pathSourceCode) 
+```
+
+<!-- Load the packages.  Suppress the output when loading packages. --> 
+```{r LoadPackages, echo=FALSE, message=FALSE}
+```
+
+<!-- Load any Global Functions declared in the R file.  Suppress the output. --> 
+```{r DeclareGlobals, echo=FALSE, message=FALSE}
+```
+
+<!-- Declare any global functions specific to a Rmd output.  Suppress the output. --> 
+```{r, echo=FALSE, message=FALSE}
+```
+
+<!-- Load the dataset.   -->
+```{r LoadData, echo=F, results='hide', message=F}
+```
+
+<!-- Tweak the dataset.   -->
+```{r TweakData, echo=F, results='hide', message=F}
+```
+
+<!-- Prepare the parameters to be sent to the MCMC.   -->
+```{r PrepareMcmc, echo=FALSE, fig.width=10}
+```
+
+## 1. Parameters
+**chainCount**: `r chainCount`
+
+**iterationCount**: `r iterationCount` (The number used for estimate -ie, it doesn't include burn-in.)
+
+**burninCount**: `r burninCount`
+
+```{r, echo=FALSE}
+#   str(dataList)
+```
+
+
+## 2. MCMCglmm
+
+```{r RunMCMCglmm, echo=FALSE}
+```
+
+### For and explanation of the graphs, see http://xavier-fim.net/packages/ggmcmc/
+```{r GraphJagsSelect, echo=FALSE, fig.height=8}
+```
+
+```{r GraphJagsAll, echo=FALSE, fig.height=8}
+```
+
+## 3. Display Syntax of Models
+
+```{r DisplayModels, echo=FALSE}
+```
+
+## --Session Info--
+```{r settings, echo=FALSE}
+cat("Report created by", Sys.info()["user"], "at", strftime(Sys.time(), "%F, %T %z"))
+sessionInfo()
+```

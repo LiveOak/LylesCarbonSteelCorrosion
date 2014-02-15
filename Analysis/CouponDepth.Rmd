@@ -23,7 +23,7 @@ opts_chunk$set(
 #     dpi = 400
 #     out.width = "600px", #This affects only the markdown, not the underlying png file.  The height will be scaled appropriately.
 
-echoChunks <- FALSE
+echoChunks <- TRUE
 options(width=120) #Widen the default text output by 50%  more characters..
 read_chunk("./Analysis/CouponDepth.R") 
 ```
@@ -58,7 +58,7 @@ The five outlier coupons are *excluded* from these two graphs (*ie*, the four pr
 
 The diamonds/means for `AcetateOnly` and `MediaControls` are on top of each other.
 
-```{r HistogramOverlay, echo=echoChunks, results='asis', message=TRUE, fig.height = 10}
+```{r HistogramOverlay, echo=FALSE, results='asis', message=TRUE, fig.height = 10}
 ```
 
 ## 2. Coupon Summary Boxplot
@@ -79,7 +79,6 @@ Model, with treatment coefficients expressed as offsets.
 
 ```{r MlmCoefficients, echo=FALSE, results='asis', message=TRUE}
 ```
-
 
 ## 4. Other Models (NOT to be used to Test Hypotheses)
 These models are mostly to check the validity & bounds for the MLM estimates in the previous section.  Notice the point estimates for each treatment are very similar (to each other and to the previous MLM).  But the standard errors and *p*-values are very different for the 'no pooling' model, and would lead to different conclusions.  The results for the MLM and pooled

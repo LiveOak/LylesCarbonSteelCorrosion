@@ -13,12 +13,15 @@ require(ggplot2) #For graphing
 require(boot) #For bootstrapped CIs
 require(lme4) #For multilevel modeling (MLM)
 require(arm) #For manipulating MLM standard errors
+require(MCMCglmm)
 # require(quantreg) #For quantile regression
 
 ############################
 ## @knitr DeclareGlobals
 pathInputSummaryBinAll <- "./Data/Derived/SummaryBinAll.rds"
 pathInputProbeAll <- "./Data/Derived/ProbeAll.rds"
+pathMcmcResults <-  "./Code/EstimateMlmMcmc/mcmcMlmResults.RData"
+
 
 bootSpread <- function( scores, weights=NULL, conf=.68 ) {
   plugin <- function( d, i ) { mean(d[i]) }  
@@ -51,10 +54,21 @@ SummarizeCorrosion <- function( d ) {
   )
 }
 
+reportTheme <- theme_bw() +
+  theme(axis.text = element_text(colour="gray40")) +
+  theme(axis.title = element_text(colour="gray40")) +
+  theme(panel.border = element_rect(colour="gray80")) +
+  theme(axis.ticks = element_blank()) +
+  theme(legend.text = element_text(colour="gray40")) +
+  theme(legend.background = element_blank()) +
+  theme(legend.key = element_blank()) +
+  theme(legend.position=c(1,0), legend.justification=c(1,0))
+
 ############################
 ## @knitr LoadData
 dsSummaryAll <- readRDS(pathInputSummaryBinAll)
 dsProbeAll <- readRDS(pathInputProbeAll)
+mcmcResultsAllChains <- load(pathMcmcResults)
 
 ############################
 ## @knitr TweakData
@@ -80,6 +94,7 @@ treatmentPalette <- RColorBrewer::brewer.pal(n=length(treatmentLevels), name="Da
 names(treatmentPalette) <- treatmentLabelsSpace
 treatmentPaletteLight <- adjustcolor(treatmentPalette, alpha.f=.2)
 
+
 ###
 ### Exclude the outliers from the main datasets
 ###
@@ -94,42 +109,34 @@ dsProbe <- dsProbeAll[dsProbeAll$OutlierStatus == "Normal", ]
 ###
 dsCouponAll <- plyr::ddply(dsSummaryAll, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
 dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
-dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion)
+dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion) #There will be six warning messages immediately below because the coupon weights aren't what hte bootstrap expects.
 #Double-check ddply call above that uses weights: dsTreatment2 <- plyr::ddply(dsProbe, c("Treatment"), summarize, M=mean(ProbeDepth))
 
+dsCouponAll <- dsCouponAll[order(dsCouponAll$OutlierStatus, dsCouponAll$CouponID, decreasing=F), ] #Sort so the jitter isn't affected when the outliers are removed
+dsCoupon <- dsCoupon[order(dsCoupon$OutlierStatus, dsCoupon$CouponID, decreasing=F), ] #Sort so the jitter isn't affected when the outliers are removed
 ###
 ### Estimate the MLM coefficients
 ###
-#The MLM that estimates an intercept for the controls, and then offsets for the four treatments.
-m <- lmer(ProbeDepth ~ 1 + Treatment + (1 | CouponID), data=dsProbe) # summary(m) # fixef(m) # ranef(m)
-seFixedEffects <- arm::se.fixef(m)
+coefficients <- mcmcMlmCondensed$statistics[, "Mean"]
 
-#The MLM that estimates each treatment mean separately (the zero indicates no grand intercept).
-m0 <- lmer(ProbeDepth ~ 0 + Treatment + (1 | CouponID), data=dsSummary, weights=ProportionAtDepth) # summary(m0)
-#The model below is slower than the weighted version; identical means, but different the standard errors
-# m0 <- lmer(ProbeDepth ~ 0 + Treatment + (1 | CouponID), data=dsProbe) # summary(m0)
-# dsMlmCoupon <- data.frame(CouponID=rownames(ranef(m0)$CouponID), MeanMlm=ranef(m0)$CouponID[, 1]) 
-# str(m0@resp)
-# str(m0@frame)
-# str(m0@pp)
-# 
-# m0@frame$CouponID
-# 
-# coef(m)$CouponID[, 1]
+#Remember that the SD of the chain is equivalent to the SE of the parameter.
+dsMlm <- data.frame(Treatment = NA_character_,
+                    Effect = coefficients, 
+                    SE = mcmcMlmCondensed$statistics[, "SD"],
+                    SELower = mcmcMlmCondensed$quantiles[, "15.87%"],
+                    SEUpper = mcmcMlmCondensed$quantiles[, "84.13%"]
+                    )
+dsMlm$Coefficient <- dsMlm$Effect
+dsMlm[2:5, c("Effect", "SELower", "SEUpper")] <- dsMlm$Effect[1] + dsMlm[2:5, c("Effect", "SELower", "SEUpper")]
 
-###
-### Include the MLM estimates in one data.frame for later convenience
-###
-dsMlm <- data.frame(Effect=fixef(m0), SE=seFixedEffects)
+rownames(dsMlm)[rownames(dsMlm)=="(Intercept)"] <- "TreatmentMediaControls"
 dsMlm$Treatment <- gsub("(Treatment)", replacement="", rownames(dsMlm), perl=TRUE)
 dsMlm$Treatment <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=treatmentLevels)
 dsMlm$TreatmentPretty <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=treatmentLabelsSpace)
-dsMlm$SELower <- dsMlm$Effect - dsMlm$SE
-dsMlm$SEUpper <- dsMlm$Effect + dsMlm$SE
+# dsMlm
 
 # grep("(?<=Treatment)(\\w+)", rownames(dsMlm), perl=TRUE, value=T);
 # regmatches(rownames(dsMlm), regexpr("(?<=Treatment)(\\w+)", rownames(dsMlm), perl=TRUE));
-# rownames(dsMlm) <- seq_along(rownames(dsMlm))
 
 # bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$ProportionAtDepth)
 # bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$PercentageAtDepth)
@@ -147,14 +154,15 @@ g1 <- ggplot(dsSummary, aes(x=ProbeDepth, y=ProportionAtDepth, color=TreatmentPr
   scale_color_manual(values=treatmentPalette) +
   scale_fill_manual(values=treatmentPaletteLight) +
   coord_flip(xlim=c(-20, 0)) + #coord_flip() +
-  theme_bw() +
-  theme(legend.position=c(1,0), legend.justification=c(1,0)) +
-  guides(colour=guide_legend(override.aes=list(alpha=1, size=5))) +
+  reportTheme +
+  guides(colour=guide_legend(title=NULL, override.aes=list(alpha=1, size=5))) +
   labs(x=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)), y="Percent of Coupon's Probes at Depth")
+
 g2 <- g1 + 
   geom_errorbarh(data=dsMlm, mapping=aes(x=Effect, xmin=SELower, xmax=SEUpper, y=.25, color=TreatmentPretty, group=NULL), size=1, alpha=.5, height=.05) +
   facet_grid(. ~ TreatmentPretty) +
   guides(color="none", fill="none") 
+
 g3 <- g2 + coord_flip() 
 
 g1
@@ -174,7 +182,7 @@ gBoxAll <- ggplot(dsCouponAll, aes(x=TreatmentPretty, y=MeanDepth, color=Treatme
   scale_color_manual(values=treatmentPalette) +
   scale_fill_manual(values=treatmentPaletteLight) +
   scale_shape_manual(values=shapeOutlier) +
-  theme_bw() +
+  reportTheme +
   guides(color="none", fill="none", shape="none") +
   labs(title="Includes Five Outliers", x=NULL, y=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)))
 # gBoxAll
@@ -184,13 +192,16 @@ gBoxMost <- gBoxAll %+%
   dsCoupon +
   labs(title="Excludes Five Outliers", y="")
 
-# ggplot2::
 gridExtra::grid.arrange(gBoxAll, gBoxMost, ncol=2, sub="Treatment")
 
 ############################
 ## @knitr MlmEstimates
 #The MLM that estimates an intercept for the controls, and then offsets for the four treatments.
-summary(m)
+summary.MCMCglmm(resultsMCMCglmm[[1]])
+
+mcmcMlmCondensed$statistics
+
+mcmcMlmCondensed$quantiles
 
 ############################
 ## @knitr MlmCoefficients
@@ -200,6 +211,18 @@ cat("\n\n")
 
 ############################
 ## @knitr OtherModels
+
+### 
+### This single-level model most closely resembles the reported MLM, and closely supports the MLM results.
+### Instead of considering *each probe* on a coupon (which the MLM does), it considers only the mean of a coupon.
+### 
+#The MLM that estimates an intercept for the controls, and then offsets for the four treatments.
+mFrequentist <- lmer(ProbeDepth ~ 1 + Treatment + (1 | CouponID), data=dsProbe) #
+summary(mFrequentist) # fixef(mFrequentist) # ranef(mFrequentist) #seFixedEffects <- arm::se.fixef(mFrequentist)
+# 
+#The MLM that estimates each treatment mean separately (the zero indicates no grand intercept).
+# mFrequentist0 <- lmer(ProbeDepth ~ 0 + Treatment + (1 | CouponID), data=dsSummary, weights=ProportionAtDepth) 
+# summary(mFrequentist0)
 
 ### 
 ### This single-level model most closely resembles the reported MLM, and closely supports the MLM results.
