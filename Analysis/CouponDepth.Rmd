@@ -70,7 +70,7 @@ The first boxplot shows all points; the four coupons processed on ConocoPhillips
 ## 3. Estimates from MLM (multilevel model) to Test Hypotheses
 The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by ConocoPhillips's machine, and one suspicious control coupon).
 
-Model, with treatment coefficients expressed as offsets.
+Model, with treatment coefficients expressed as offsets.  For more information about the MCMC, see `r pathMcmcCode` and it's html output.
 
 ```{r MlmEstimates, echo=FALSE,  message=TRUE}
 ```

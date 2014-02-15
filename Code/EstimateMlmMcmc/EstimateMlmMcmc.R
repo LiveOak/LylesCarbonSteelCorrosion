@@ -13,7 +13,7 @@ pathInputProbeAll <- "./Data/Derived/ProbeAll.rds"
 pathMcmcResults <-  "./Code/EstimateMlmMcmc/mcmcMlmResults.RData"
 
 chainCount <- 4L
-iterationCount <- 1000L #The number used for estimate (ie, it doesn't include burn-in)
+iterationCount <- 5000L #The number used for estimate (ie, it doesn't include burn-in)
 burninCount <- iterationCount / 4L #This quantity affects the adapation length (and hense time duration) of `jags.model`.
 thinCount <- 1
 

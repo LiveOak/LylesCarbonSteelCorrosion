@@ -36,9 +36,9 @@
 ## 1. Parameters
 **chainCount**: 4
 
-**iterationCount**: 1000 (The number used for estimate -ie, it doesn't include burn-in.)
+**iterationCount**: 5000 (The number used for estimate -ie, it doesn't include burn-in.)
 
-**burninCount**: 250
+**burninCount**: 1250
 
 
 
@@ -53,78 +53,118 @@
 
                       MCMC iteration = 1000
 
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
                       MCMC iteration = 0
 
                       MCMC iteration = 1000
 
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
                       MCMC iteration = 0
 
                       MCMC iteration = 1000
 
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
                       MCMC iteration = 0
 
                       MCMC iteration = 1000
+
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
 ```
 
 ```
-Time difference of 2.509 mins
+Time difference of 13.72 mins
 ```
 
 ```
 
- Iterations = 251:1000
+ Iterations = 1251:6250
  Thinning interval  = 1
- Sample size  = 750 
+ Sample size  = 5000 
 
  DIC: 815367 
 
  G-structure:  ~CouponID
 
          post.mean l-95% CI u-95% CI eff.samp
-CouponID      6.35     4.26     8.61      601
+CouponID      6.38     4.12     8.69     4026
 
  R-structure:  ~units
 
       post.mean l-95% CI u-95% CI eff.samp
-units      10.4     10.3     10.4      750
+units      10.4     10.3     10.4     5000
 
  Location effects: ProbeDepth ~ 1 + Treatment 
 
-                        post.mean l-95% CI u-95% CI eff.samp  pMCMC   
-(Intercept)               -6.1928  -7.1613  -5.1435      750 <0.001 **
-TreatmentAcetateOnly      -0.0329  -2.3283   2.1307      750  0.973   
-TreatmentMethane          -0.8871  -3.6244   1.4970      750  0.509   
-TreatmentSulfideAcetate   -2.1877  -4.2826  -0.6954      750  0.035 * 
-TreatmentSulfideOnly       0.2686  -1.2866   1.8113      750  0.709   
+                        post.mean l-95% CI u-95% CI eff.samp  pMCMC    
+(Intercept)               -6.2073  -7.2372  -5.1880     5000 <2e-04 ***
+TreatmentAcetateOnly      -0.0299  -2.2630   2.1734     5000  0.972    
+TreatmentMethane          -0.8075  -3.3131   1.5091     5000  0.507    
+TreatmentSulfideAcetate   -2.1741  -3.9497  -0.4624     5000  0.015 *  
+TreatmentSulfideOnly       0.3232  -1.2145   1.9578     5000  0.702    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```
 
-Iterations = 251:1000
+Iterations = 1251:6250
 Thinning interval = 1 
 Number of chains = 4 
-Sample size per chain = 750 
+Sample size per chain = 5000 
 
 1. Empirical mean and standard deviation for each variable,
    plus standard error of the mean:
 
                            Mean    SD Naive SE Time-series SE
-(Intercept)             -6.1960 0.515   0.0094        0.00956
-TreatmentAcetateOnly    -0.0349 1.138   0.0208        0.02026
-TreatmentMethane        -0.8303 1.239   0.0226        0.02261
-TreatmentSulfideAcetate -2.1876 0.902   0.0165        0.01722
-TreatmentSulfideOnly     0.3032 0.814   0.0149        0.01486
+(Intercept)             -6.2090 0.515  0.00364        0.00358
+TreatmentAcetateOnly    -0.0156 1.144  0.00809        0.00809
+TreatmentMethane        -0.7918 1.246  0.00881        0.00859
+TreatmentSulfideAcetate -2.1819 0.891  0.00630        0.00627
+TreatmentSulfideOnly     0.3086 0.816  0.00577        0.00573
 
 2. Quantiles for each variable:
 
                          2.5% 15.87%    25%     50%     75% 84.13%  97.5%
-(Intercept)             -7.22 -6.697 -6.530 -6.2021 -5.8677 -5.707 -5.169
-TreatmentAcetateOnly    -2.32 -1.142 -0.787 -0.0564  0.7316  1.096  2.174
-TreatmentMethane        -3.29 -2.070 -1.643 -0.8215 -0.0177  0.395  1.659
-TreatmentSulfideAcetate -3.95 -3.088 -2.780 -2.1787 -1.5934 -1.307 -0.407
-TreatmentSulfideOnly    -1.29 -0.514 -0.262  0.3076  0.8405  1.112  1.900
+(Intercept)             -7.21 -6.717 -6.550 -6.2085 -5.8634 -5.700 -5.189
+TreatmentAcetateOnly    -2.26 -1.158 -0.782 -0.0183  0.7507  1.116  2.218
+TreatmentMethane        -3.23 -2.036 -1.625 -0.7904  0.0351  0.442  1.669
+TreatmentSulfideAcetate -3.94 -3.068 -2.780 -2.1817 -1.5781 -1.294 -0.456
+TreatmentSulfideOnly    -1.27 -0.503 -0.250  0.3066  0.8498  1.128  1.913
 ```
 
 ```
@@ -154,7 +194,7 @@ Effective Size:
 
 ```
             (Intercept)    TreatmentAcetateOnly        TreatmentMethane TreatmentSulfideAcetate    TreatmentSulfideOnly 
-                   2909                    3180                    3000                    2758                    3000 
+                  20692                   20000                   21080                   20206                   20354 
 ```
 
 
@@ -179,7 +219,7 @@ Error: subscript out of bounds
 
 
 ```
-Warning: Removed 12 rows containing missing values (geom_point).
+Warning: Removed 20 rows containing missing values (geom_point).
 ```
 
 ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll1.png) ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll2.png) ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll3.png) ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll4.png) 
@@ -193,7 +233,7 @@ function( x ) {
   MCMCglmm(fixed = ProbeDepth ~ 1 + Treatment,
            random = ~ CouponID,
            data = dsProbe, 
-           nitt = iterationCount,
+           nitt = iterationCount + burninCount,
            burnin = burninCount,
            thin = thinCount)
 }
@@ -203,7 +243,7 @@ function( x ) {
 ## --Session Info--
 
 ```
-Report created by Will at 2014-02-15, 00:36:58 -0600
+Report created by Will at 2014-02-15, 01:27:03 -0600
 ```
 
 ```

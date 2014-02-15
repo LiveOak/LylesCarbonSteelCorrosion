@@ -50,7 +50,7 @@ require(MCMCglmm)
 pathInputSummaryBinAll <- "./Data/Derived/SummaryBinAll.rds"
 pathInputProbeAll <- "./Data/Derived/ProbeAll.rds"
 pathMcmcResults <-  "./Code/EstimateMlmMcmc/mcmcMlmResults.RData"
-
+pathMcmcCode <- "./EstimateMlmMcmc/EstimateMlmMcmc.R"
 
 bootSpread <- function( scores, weights=NULL, conf=.68 ) {
   plugin <- function( d, i ) { mean(d[i]) }  
@@ -253,55 +253,55 @@ gridExtra::grid.arrange(gBoxAll, gBoxMost, ncol=2, sub="Treatment")
 ## 3. Estimates from MLM (multilevel model) to Test Hypotheses
 The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by ConocoPhillips's machine, and one suspicious control coupon).
 
-Model, with treatment coefficients expressed as offsets.
+Model, with treatment coefficients expressed as offsets.  For more information about the MCMC, see ./EstimateMlmMcmc/EstimateMlmMcmc.R and it's html output.
 
 
 ```
 
- Iterations = 251:1000
+ Iterations = 1251:6250
  Thinning interval  = 1
- Sample size  = 750 
+ Sample size  = 5000 
 
  DIC: 815367 
 
  G-structure:  ~CouponID
 
          post.mean l-95% CI u-95% CI eff.samp
-CouponID      6.35     4.26     8.61      601
+CouponID      6.38     4.12     8.69     4026
 
  R-structure:  ~units
 
       post.mean l-95% CI u-95% CI eff.samp
-units      10.4     10.3     10.4      750
+units      10.4     10.3     10.4     5000
 
  Location effects: ProbeDepth ~ 1 + Treatment 
 
-                        post.mean l-95% CI u-95% CI eff.samp  pMCMC   
-(Intercept)               -6.1928  -7.1613  -5.1435      750 <0.001 **
-TreatmentAcetateOnly      -0.0329  -2.3283   2.1307      750  0.973   
-TreatmentMethane          -0.8871  -3.6244   1.4970      750  0.509   
-TreatmentSulfideAcetate   -2.1877  -4.2826  -0.6954      750  0.035 * 
-TreatmentSulfideOnly       0.2686  -1.2866   1.8113      750  0.709   
+                        post.mean l-95% CI u-95% CI eff.samp  pMCMC    
+(Intercept)               -6.2073  -7.2372  -5.1880     5000 <2e-04 ***
+TreatmentAcetateOnly      -0.0299  -2.2630   2.1734     5000  0.972    
+TreatmentMethane          -0.8075  -3.3131   1.5091     5000  0.507    
+TreatmentSulfideAcetate   -2.1741  -3.9497  -0.4624     5000  0.015 *  
+TreatmentSulfideOnly       0.3232  -1.2145   1.9578     5000  0.702    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```
                             Mean     SD Naive SE Time-series SE
-(Intercept)             -6.19601 0.5149 0.009401       0.009559
-TreatmentAcetateOnly    -0.03486 1.1384 0.020784       0.020257
-TreatmentMethane        -0.83032 1.2386 0.022613       0.022615
-TreatmentSulfideAcetate -2.18762 0.9020 0.016468       0.017225
-TreatmentSulfideOnly     0.30321 0.8137 0.014855       0.014858
+(Intercept)             -6.20903 0.5150 0.003641       0.003583
+TreatmentAcetateOnly    -0.01561 1.1440 0.008090       0.008090
+TreatmentMethane        -0.79185 1.2464 0.008813       0.008590
+TreatmentSulfideAcetate -2.18191 0.8910 0.006300       0.006269
+TreatmentSulfideOnly     0.30857 0.8164 0.005773       0.005725
 ```
 
 ```
                           2.5%  15.87%     25%      50%      75%  84.13%   97.5%
-(Intercept)             -7.224 -6.6966 -6.5304 -6.20205 -5.86771 -5.7066 -5.1688
-TreatmentAcetateOnly    -2.323 -1.1423 -0.7866 -0.05641  0.73164  1.0960  2.1736
-TreatmentMethane        -3.294 -2.0696 -1.6432 -0.82152 -0.01766  0.3952  1.6592
-TreatmentSulfideAcetate -3.953 -3.0885 -2.7804 -2.17869 -1.59340 -1.3069 -0.4072
-TreatmentSulfideOnly    -1.287 -0.5138 -0.2619  0.30761  0.84050  1.1116  1.8999
+(Intercept)             -7.211 -6.7171 -6.5499 -6.20847 -5.86343 -5.6997 -5.1892
+TreatmentAcetateOnly    -2.257 -1.1583 -0.7822 -0.01834  0.75068  1.1157  2.2184
+TreatmentMethane        -3.235 -2.0359 -1.6253 -0.79045  0.03512  0.4419  1.6690
+TreatmentSulfideAcetate -3.938 -3.0682 -2.7798 -2.18171 -1.57811 -1.2937 -0.4555
+TreatmentSulfideOnly    -1.275 -0.5032 -0.2499  0.30663  0.84983  1.1277  1.9126
 ```
 
 
@@ -310,11 +310,11 @@ Model, with treatment coefficients expressed as offsets.
 
 |id                       |Treatment       |  Effect|      SE|  SELower|  SEUpper|  Coefficient|TreatmentPretty  |
 |:------------------------|:---------------|-------:|-------:|--------:|--------:|------------:|:----------------|
-|TreatmentMediaControls   |MediaControls   |  -6.196|  0.5149|   -6.697|   -5.707|     -6.19601|Media Controls   |
-|TreatmentAcetateOnly     |AcetateOnly     |  -6.231|  1.1384|   -7.338|   -5.100|     -0.03486|Acetate Only     |
-|TreatmentMethane         |Methane         |  -7.026|  1.2386|   -8.266|   -5.801|     -0.83032|Methane          |
-|TreatmentSulfideAcetate  |SulfideAcetate  |  -8.384|  0.9020|   -9.284|   -7.503|     -2.18762|Sulfide Acetate  |
-|TreatmentSulfideOnly     |SulfideOnly     |  -5.893|  0.8137|   -6.710|   -5.084|      0.30321|Sulfide Only     |
+|TreatmentMediaControls   |MediaControls   |  -6.209|  0.5150|   -6.717|   -5.700|     -6.20903|Media Controls   |
+|TreatmentAcetateOnly     |AcetateOnly     |  -6.225|  1.1440|   -7.367|   -5.093|     -0.01561|Acetate Only     |
+|TreatmentMethane         |Methane         |  -7.001|  1.2464|   -8.245|   -5.767|     -0.79185|Methane          |
+|TreatmentSulfideAcetate  |SulfideAcetate  |  -8.391|  0.8910|   -9.277|   -7.503|     -2.18191|Sulfide Acetate  |
+|TreatmentSulfideOnly     |SulfideOnly     |  -5.900|  0.8164|   -6.712|   -5.081|      0.30857|Sulfide Only     |
 
 
 ## 4. Other Models (NOT to be used to Test Hypotheses)
@@ -612,7 +612,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-15, 01:10:17 -0600
+Report created by Will at 2014-02-15, 08:25:38 -0600
 ```
 
 ```

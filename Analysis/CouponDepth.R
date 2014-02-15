@@ -21,7 +21,7 @@ require(MCMCglmm)
 pathInputSummaryBinAll <- "./Data/Derived/SummaryBinAll.rds"
 pathInputProbeAll <- "./Data/Derived/ProbeAll.rds"
 pathMcmcResults <-  "./Code/EstimateMlmMcmc/mcmcMlmResults.RData"
-
+pathMcmcCode <- "./EstimateMlmMcmc/EstimateMlmMcmc.R"
 
 bootSpread <- function( scores, weights=NULL, conf=.68 ) {
   plugin <- function( d, i ) { mean(d[i]) }  
