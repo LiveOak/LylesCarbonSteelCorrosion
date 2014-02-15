@@ -31,66 +31,49 @@ base::require(knitr)
 base::require(markdown)
 base::require(testit)
 
+###################################
+# Declare the paths of the necessary files.
 
-# #########################################################################################################
-# ####
-# #### The following example comes from https://github.com/wibeasley/Wats.  Rename the paths appropriately.
-# ####
-# 
-# 
-# ###################################
-# # Declare the paths of the necessary files.
-# 
-# # The raw/input data files:
-# pathCensus199x <- base::paste0("./Datasets/CensusIntercensal/STCH-icen199", 0:9, ".txt")
-# pathCensus200x <- "./Datasets/CensusIntercensal/CO-EST00INT-AGESEX-5YR.csv"
-# pathCountyFips <- "./Datasets/CountyFipsCode.csv"
-# 
-# # The derived/intermediate data files (which are produced by the repository's code files):
-# pathCensusYearly <- "./Datasets/CensusIntercensal/CensusCountyYear.csv"
-# pathCensusMonthly <- "./Datasets/CensusIntercensal/CensusCountyMonth.csv"
-# pathDataForAnalaysis2005 <- "./Datasets/CountyMonthBirthRate2005Version.csv"
-# pathDataForAnalaysis2014 <- "./Datasets/CountyMonthBirthRate2014Version.csv"
-# 
-# # Code Files:
-# pathManipulateCensus <- "./UtilityScripts/IsolateCensusPopsForGfr.R"
-# pathCalculateGfr <- "./UtilityScripts/CalculateGfr.R"
-# 
-# #Report Files:
-# pathsReports <- base::file.path("./vignettes", c("MbrFigures.Rmd", "OkFertilityWithIntercensalEstimates.Rmd"))
-# 
-# ###################################
-# # Verify the necessary path can be found.
-# 
-# # The raw/input data files:
-# testit::assert("The 10 census files from 199x should exist.", base::file.exists(pathCensus199x))
-# testit::assert("The 200x census file should exist.", base::file.exists(pathCensus200x))
-# testit::assert("The county FIPS values should exist.", base::file.exists(pathCountyFips))
-# 
-# # Code Files:
-# testit::assert("The file that restructures the census data should exist.", base::file.exists(pathManipulateCensus))
-# testit::assert("The file that calculates the GFR should exist.", base::file.exists(pathCalculateGfr))
-# 
-# #Report Files:
-# testit::assert("The knitr Rmd files should exist.", base::file.exists(pathsReports))
-# 
-# ###################################
-# # Run the files that manipulate and analyze.
-# 
-# # Execute code that restructures the Census data
-# base::source(pathManipulateCensus, local=base::new.env())
-# 
-# # Assert that the intermediate files exist (the two files produced by `IsolateCensusPopsForGfr.R`)
-# testit::assert("The yearly records should exist.", base::file.exists(pathCensusYearly))
-# testit::assert("The monthly records should exist.", base::file.exists(pathCensusMonthly))
-# 
-# #Execute code that combines the census and birth count data.
-# base::source(pathCalculateGfr, local=base::new.env())
-# 
-# # Verify that the two human readable datasets are present.
-# testit::assert("The CSV for the 2005 Version should exist.", base::file.exists(pathDataForAnalaysis2005))
-# testit::assert("The CSV for the 2014 Version should exist.", base::file.exists(pathDataForAnalaysis2014))
-# 
+# The raw/input data files:
+pathInputProfilometer <- "./Data/Raw/CouponPitDepth.csv" #Each record is a bin on the histogram
+
+# The derived/intermediate data files (which are produced by the repository's code files):
+pathDerivedSummaryBinAll <- "./Data/Derived/SummaryBinAll.rds"
+pathDerivedProbeAll <- "./Data/Derived/ProbeAll.rds"
+
+# Code Files:
+pathAugment <- "./Code/AugmentData.R"
+pathAnalysis <- "./Analysis/CouponDepth.R"
+
+#Report Files:
+pathsReports <- base::file.path("./Analysis", c("CouponDepth.Rmd"))
+
+###################################
+# Verify the necessary path can be found.
+
+# The raw/input data files:
+testit::assert("The profilometer data should exist.", base::file.exists(pathInputProfilometer))
+
+# Code Files:
+testit::assert("The file that restructures the data should exist.", base::file.exists(pathAugment))
+testit::assert("The file that analyzes all the models should exist.", base::file.exists(pathAnalysis))
+
+#Report Files:
+testit::assert("The knitr Rmd files should exist.", base::file.exists(pathsReports))
+
+###################################
+# Run the files that manipulate and analyze.
+
+# Execute code that restructures the Census data
+base::source(pathAugment, local=base::new.env())
+
+# Assert that the intermediate files exist (the two files produced by `AugmentData.R`)
+testit::assert("The augmented profilometer records should exist.", base::file.exists(pathDerivedSummaryBinAll))
+testit::assert("The profilometer-expanded records should exist.", base::file.exists(pathDerivedProbeAll))
+
+#Execute code that analyzes & graphs the models
+base::source(pathAnalysis, local=base::new.env())
+
 # ###################################
 # # Build the reports
 # for( pathRmd in pathsReports ) {

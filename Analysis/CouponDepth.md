@@ -69,7 +69,7 @@ The diamonds/means for `AcetateOnly` and `MediaControls` are on top of each othe
 ## 2. Coupon Summary Boxplot
 The first boxplot shows all points; the four coupons processed on ConocoPhillips machine are marked with a regular triangle.  Another suspicious coupon (in `MediaControls`) is marked with an upside-down triangle.  The second boxplot excludes those five coupons; notice the scale of the *y*-axis has changed.
 
-![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot1.png) ![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot2.png) 
+![plot of chunk CouponSummaryBoxplot](figure_raw/CouponSummaryBoxplot.png) 
 
 
 ## 3. Estimates from MLM (multilevel model) to Test Hypotheses
@@ -111,13 +111,13 @@ TrtmntSlfdO -0.632  0.283  0.263  0.365
 Model, with treatment coefficients expressed as offsets.
 
 
-|id                       |  Effect|      SE|Treatment       |  SELower|  SEUpper|
-|:------------------------|-------:|-------:|:---------------|--------:|--------:|
-|TreatmentMediaControls   |  -6.206|  0.5063|MediaControls   |   -6.713|   -5.700|
-|TreatmentAcetateOnly     |  -6.222|  1.1322|AcetateOnly     |   -7.354|   -5.090|
-|TreatmentMethane         |  -7.013|  1.2194|Methane         |   -8.232|   -5.793|
-|TreatmentSulfideAcetate  |  -8.383|  0.8770|SulfideAcetate  |   -9.260|   -7.506|
-|TreatmentSulfideOnly     |  -5.898|  0.8006|SulfideOnly     |   -6.699|   -5.097|
+|id                       |  Effect|      SE|Treatment       |TreatmentPretty  |  SELower|  SEUpper|
+|:------------------------|-------:|-------:|:---------------|:----------------|--------:|--------:|
+|TreatmentMediaControls   |  -6.206|  0.5063|MediaControls   |Media Controls   |   -6.713|   -5.700|
+|TreatmentAcetateOnly     |  -6.222|  1.1322|AcetateOnly     |Acetate Only     |   -7.354|   -5.090|
+|TreatmentMethane         |  -7.013|  1.2194|Methane         |Methane          |   -8.232|   -5.793|
+|TreatmentSulfideAcetate  |  -8.383|  0.8770|SulfideAcetate  |Sulfide Acetate  |   -9.260|   -7.506|
+|TreatmentSulfideOnly     |  -5.898|  0.8006|SulfideOnly     |Sulfide Only     |   -6.699|   -5.097|
 
 
 
@@ -128,7 +128,7 @@ These models are mostly to check the validity & bounds for the MLM estimates in 
 ```r
 ### 
 ### This single-level model most closely resembles the reported MLM, and closely supports the MLM results.
-### Instead of considering each probe on a coupon (which the MLM does), it considers only the coupon's mean.
+### Instead of considering *each probe* on a coupon (which the MLM does), it considers only the mean of a coupon.
 ### 
 mSingle <- lm(MeanDepth ~ 1 + Treatment, data=dsCoupon)
 summary(mSingle)
@@ -186,14 +186,6 @@ Residual standard error: 2.57 on 62 degrees of freedom
 ```
 
 ```r
-anova(mCompletePooling, mNoTreatmentSingle)
-```
-
-```
-Error: object 'mCompletePooling' not found
-```
-
-```r
 
 ### 
 ### This multi-level model ignores the treatment variable (and becomes the grand-mean, but with intercepts estiamted for each coupon).
@@ -239,6 +231,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```r
 
 ### 
+### For the next two models, notice the dataset changes so that each probe has its own record (not each coupon)
 ### This 'No Pooling' model incorrectly assumes there's no dependencies between probes on the same coupon
 ### The standard errors are inappropriately small (Gelman & Hill, 2007, section 12).
 ### 
@@ -365,13 +358,29 @@ Multiple R-squared:  0.0485,	Adjusted R-squared:  0.0484
 F-statistic: 2.01e+03 on 4 and 157527 DF,  p-value: <2e-16
 ```
 
+```r
+anova(mCompletePooling, mNoPooling)
+```
+
+```
+Analysis of Variance Table
+
+Model 1: ProbeDepth ~ 1 + Treatment
+Model 2: ProbeDepth ~ 1 + Treatment + CouponID
+  Res.Df     RSS Df Sum of Sq    F Pr(>F)    
+1 157527 2523094                             
+2 157469 1630792 58    892301 1486 <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
 
 ## Session Information
 For the sake of documentation and reproducibility, the current report was build on a system using the following software.
 
 
 ```
-Report created by Will at 2014-02-14, 18:34:54 -0600
+Report created by Will at 2014-02-14, 21:40:31 -0600
 ```
 
 ```
@@ -383,16 +392,16 @@ locale:
 [4] LC_NUMERIC=C                           LC_TIME=English_United States.1252    
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] grid      stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
  [1] arm_1.6-10         MASS_7.3-29        lme4_1.0-6         Matrix_1.1-0       lattice_0.20-24    boot_1.3-9        
- [7] ggplot2_0.9.3.1    plyr_1.8.0.99      RColorBrewer_1.0-5 knitr_1.5         
+ [7] ggplot2_0.9.3.1    gridExtra_0.9.1    plyr_1.8.0.99      RColorBrewer_1.0-5 testit_0.3         knitr_1.5         
 
 loaded via a namespace (and not attached):
  [1] abind_1.4-0      coda_0.16-1      colorspace_1.2-4 dichromat_2.0-0  digest_0.6.4     evaluate_0.5.1  
- [7] formatR_0.10     grid_3.1.0       gtable_0.1.2     labeling_0.2     minqa_1.2.3      munsell_0.4.2   
-[13] nlme_3.1-113     proto_0.3-10     Rcpp_0.11.0      reshape2_1.2.2   scales_0.2.3     splines_3.1.0   
-[19] stringr_0.6.2    tools_3.1.0     
+ [7] formatR_0.10     gtable_0.1.2     labeling_0.2     minqa_1.2.3      munsell_0.4.2    nlme_3.1-113    
+[13] proto_0.3-10     Rcpp_0.11.0      reshape2_1.2.2   scales_0.2.3     splines_3.1.0    stringr_0.6.2   
+[19] tools_3.1.0     
 ```
 
