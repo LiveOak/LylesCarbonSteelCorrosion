@@ -1,7 +1,9 @@
 ﻿
-Version 0.1 (Developed 2014-02-12 through ?)
+Developed 2014-02-12 through 2014-02-15
 ------------------------------------------------------------------------------
 New Features:
+* Estimated corrosion depth with Bayesian MCMC MLMs and Frequentist MLMs.
+* Included UtilityScripts/Reproduce.R to facilitate reproducible research.
 * Initializing repository with file structure skeleton
 
 GitHub Commits
