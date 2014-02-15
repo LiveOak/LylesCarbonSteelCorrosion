@@ -24,7 +24,7 @@ opts_chunk$set(
 #     out.width = "600px", #This affects only the markdown, not the underlying png file.  The height will be scaled appropriately.
 
 echoChunks <- TRUE
-options(width=120) #Widen the default text output by 50%  more characters..
+options(width=180) #Widen the text output from the default of 80 characters.
 read_chunk("./Analysis/CouponDepth.R") 
 ```
 <!-- Load the packages.  Suppress the output when loading packages. --> 
@@ -50,7 +50,7 @@ read_chunk("./Analysis/CouponDepth.R")
 ## 1. Histogram Overlay
 The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The ticks on the right side indicate a *coupon's* mean depth.
 
-The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a multilevel model, shown below.  
+The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a Bayesian multilevel model, shown below.  They bands mark the 16% and 84% quantiles of the posterior distribution; this distance asympototically agrees with the 68% coverage of a +/-1 parametric SE band.
 
 The **third graph** is identical, yet loosens the *y*-axis range so that the full depth of the pits are visible.  Consider if a coupon's maximum pit depth is a variable worth including in a formal analysis.
 
@@ -67,7 +67,7 @@ The first boxplot shows all points; the four coupons processed on ConocoPhillips
 ```{r CouponSummaryBoxplot, echo=echoChunks, results='asis', message=TRUE}
 ```
 
-## 3. Estimates from MLM (multilevel model) to Test Hypotheses
+## 3. Estimates from Bayesian MLM (multilevel model) to Test Hypotheses
 The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by ConocoPhillips's machine, and one suspicious control coupon).
 
 Model, with treatment coefficients expressed as offsets.  For more information about the MCMC, see `r pathMcmcCode` and it's html output.
@@ -80,7 +80,13 @@ Model, with treatment coefficients expressed as offsets.
 ```{r MlmCoefficients, echo=FALSE, results='asis', message=TRUE}
 ```
 
-## 4. Other Models (NOT to be used to Test Hypotheses)
+## 4. Unmodeled Estimates
+These estimates don't come from any model, but come from the observed slices.  They should closely corroborate the modeled estimates.  The `MeanDepth` is the weighted mean, using the histogram bins outputed by the profilometer.  The `MeanDepthV2`, `ParametricSELower`, and `ParametricSEUpper` uses a weighted `lm` estimate.  The uppoer and lower points represent a *symmetric* band, using standard error as the radius.  This contrasts with the Bayesian MLM bands, which can be assymetric, because they're from the 16% and 84% quantiles of the posterior distribution; this distance asympototically agrees with the 68% coverage of a +/-1 parametric SE band.
+
+```{r UnmodeledEstimates, echo=TRUE, message=TRUE}
+```
+
+## 5. Other Models (NOT to be used to Test Hypotheses)
 These models are mostly to check the validity & bounds for the MLM estimates in the previous section.  Notice the point estimates for each treatment are very similar (to each other and to the previous MLM).  But the standard errors and *p*-values are very different for the 'no pooling' model, and would lead to different conclusions.  The results for the MLM and pooled
 
 ```{r OtherModels, echo=TRUE, message=TRUE}

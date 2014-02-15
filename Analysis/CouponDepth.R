@@ -40,12 +40,12 @@ SummarizeCorrosion <- function( d ) {
   se <- coef(summary(weightedModel))["(Intercept)", "Std. Error"]  
   parametricCI <- meanV2 + c(-1, 1) * se
   
-  bootCI <- bootSpread(scores=d$ProbeDepth, weights=dsSummaryAll$ProportionAtDepth)
+  bootCI <- bootSpread(scores=d$ProbeDepth, weights=d$ProportionAtDepth)
   data.frame(
     Top = max(d$ProbeDepth),
+    Bottom = min(d$ProbeDepth),
     MeanDepth = meanV1,
     MeanDepthV2 = meanV2,
-    Bottom = min(d$ProbeDepth),
     ParametricSELower = parametricCI[1],
     ParametricSEUpper = parametricCI[2],
     BootSELower = bootCI[1],
@@ -109,7 +109,7 @@ dsProbe <- dsProbeAll[dsProbeAll$OutlierStatus == "Normal", ]
 ###
 dsCouponAll <- plyr::ddply(dsSummaryAll, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
 dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
-dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion) #There will be six warning messages immediately below because the coupon weights aren't what hte bootstrap expects.
+dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion) 
 #Double-check ddply call above that uses weights: dsTreatment2 <- plyr::ddply(dsProbe, c("Treatment"), summarize, M=mean(ProbeDepth))
 
 dsCouponAll <- dsCouponAll[order(dsCouponAll$OutlierStatus, dsCouponAll$CouponID, decreasing=F), ] #Sort so the jitter isn't affected when the outliers are removed
@@ -139,23 +139,22 @@ dsMlm$TreatmentPretty <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=
 # regmatches(rownames(dsMlm), regexpr("(?<=Treatment)(\\w+)", rownames(dsMlm), perl=TRUE));
 
 # bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$ProportionAtDepth)
-# bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$PercentageAtDepth)
 # bootSpread(scores=dsProbe$ProbeDepth)
 
 ############################
 ## @knitr HistogramOverlay
 g1 <- ggplot(dsSummary, aes(x=ProbeDepth, y=ProportionAtDepth, color=TreatmentPretty, group=CouponID)) +
 #   geom_vline(data=dsTreatment, mapping=aes(xintercept=MeanDepth, color=Treatment, group=NULL)) +
-#   geom_point(data=dsMlm, mapping=aes(x=Effect, y=.25, color=TreatmentPretty, fill=TreatmentPretty, group=NULL), shape=23, size=8) +
+  geom_point(data=dsMlm, mapping=aes(x=Effect, y=.25, color=TreatmentPretty, fill=TreatmentPretty, group=NULL), shape=23, size=8) +
   geom_point(alpha=.2) +
   geom_line(alpha=.5) +
-#   geom_rug(data=dsCoupon, mapping=aes(x=MeanDepth, y=NULL), sides="r") +
+  geom_rug(data=dsCoupon, mapping=aes(x=MeanDepth, y=NULL), sides="r") +
   scale_y_continuous(label=scales::percent) +
   scale_color_manual(values=treatmentPalette) +
   scale_fill_manual(values=treatmentPaletteLight) +
   coord_flip(xlim=c(-20, 0)) + #coord_flip() +
   reportTheme +
-  guides(colour=guide_legend(title=NULL, override.aes=list(alpha=1, size=5))) +
+  guides(colour=guide_legend(title=NULL, override.aes=list(alpha=.2, size=5)), fill="none") +
   labs(x=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)), y="Percent of Coupon's Probes at Depth")
 
 g2 <- g1 + 
@@ -210,6 +209,12 @@ kable(dsMlm)
 cat("\n\n")
 
 ############################
+## @knitr UnmodeledEstimates
+dsTreatment
+
+dsCouponAll
+
+############################
 ## @knitr OtherModels
 
 ### 
@@ -242,7 +247,7 @@ summary(mNoTreatmentSingle)
 ### 
 mNoTreatmentMlm <- lmer(ProbeDepth ~ 1 + (1 | CouponID), data=dsProbe)
 summary(mNoTreatmentMlm)
-anova(m, mNoTreatmentMlm)
+anova(mFrequentist, mNoTreatmentMlm)
 
 ### 
 ### For the next two models, notice the dataset changes so that each probe has its own record (not each coupon)

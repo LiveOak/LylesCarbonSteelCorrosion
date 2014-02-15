@@ -20,7 +20,7 @@ opts_chunk$set(results = "show", comment = NA, tidy = FALSE, dpi = 100, fig.widt
 # underlying png file.  The height will be scaled appropriately.
 
 echoChunks <- TRUE
-options(width = 120)  #Widen the default text output by 50%  more characters..
+options(width = 180)  #Widen the text output from the default of 80 characters.
 read_chunk("./Analysis/CouponDepth.R")
 ```
 
@@ -69,12 +69,12 @@ SummarizeCorrosion <- function( d ) {
   se <- coef(summary(weightedModel))["(Intercept)", "Std. Error"]  
   parametricCI <- meanV2 + c(-1, 1) * se
   
-  bootCI <- bootSpread(scores=d$ProbeDepth, weights=dsSummaryAll$ProportionAtDepth)
+  bootCI <- bootSpread(scores=d$ProbeDepth, weights=d$ProportionAtDepth)
   data.frame(
     Top = max(d$ProbeDepth),
+    Bottom = min(d$ProbeDepth),
     MeanDepth = meanV1,
     MeanDepthV2 = meanV2,
-    Bottom = min(d$ProbeDepth),
     ParametricSELower = parametricCI[1],
     ParametricSEUpper = parametricCI[2],
     BootSELower = bootCI[1],
@@ -151,16 +151,11 @@ dsProbe <- dsProbeAll[dsProbeAll$OutlierStatus == "Normal", ]
 ###
 dsCouponAll <- plyr::ddply(dsSummaryAll, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
 dsCoupon <- plyr::ddply(dsSummary, c("Treatment", "TreatmentPretty", "CouponID", "OutlierStatus"), SummarizeCorrosion)
-dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion) #There will be six warning messages immediately below because the coupon weights aren't what hte bootstrap expects.
+dsTreatment <- plyr::ddply(dsSummary, c("Treatment"), SummarizeCorrosion) 
 ```
 
 ```
-Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [984]
 Warning: Walker's alias method used: results are different from R < 2.2.0
-Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [246]
-Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [205]
-Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [492]
-Warning: data length [2788] is not a sub-multiple or multiple of the number of rows [656]
 ```
 
 ```r
@@ -193,7 +188,6 @@ dsMlm$TreatmentPretty <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=
 # regmatches(rownames(dsMlm), regexpr("(?<=Treatment)(\\w+)", rownames(dsMlm), perl=TRUE));
 
 # bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$ProportionAtDepth)
-# bootSpread(scores=dsSummary$ProbeDepth, weights=dsSummary$PercentageAtDepth)
 # bootSpread(scores=dsProbe$ProbeDepth)
 
 ############################
@@ -203,7 +197,7 @@ dsMlm$TreatmentPretty <- factor(dsMlm$Treatment, levels=treatmentLevels, labels=
 ## 1. Histogram Overlay
 The **first graph** represents the probe heights, as a distance from the coupon's surface.  Each curve represents a histogram.  The *y* value is the depth of the probe, while the *x* indicates how much of the coupon has pits of that depth.  Th diamonds indicate a *treatement's* mean depth. The ticks on the right side indicate a *coupon's* mean depth.
 
-The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a multilevel model, shown below.  
+The **second graph** is almost identical to the first, but with two differences.  First, each treatment has its own facet.  Second, the standard errors are shown around each treatment mean; the means and errors were estimated with a Bayesian multilevel model, shown below.  They bands mark the 16% and 84% quantiles of the posterior distribution; this distance asympototically agrees with the 68% coverage of a +/-1 parametric SE band.
 
 The **third graph** is identical, yet loosens the *y*-axis range so that the full depth of the pits are visible.  Consider if a coupon's maximum pit depth is a variable worth including in a formal analysis.
 
@@ -250,7 +244,7 @@ gridExtra::grid.arrange(gBoxAll, gBoxMost, ncol=2, sub="Treatment")
 ```
 
 
-## 3. Estimates from MLM (multilevel model) to Test Hypotheses
+## 3. Estimates from Bayesian MLM (multilevel model) to Test Hypotheses
 The five outlier coupons are *excluded* from these two graphs (*ie*, the four processed by ConocoPhillips's machine, and one suspicious control coupon).
 
 Model, with treatment coefficients expressed as offsets.  For more information about the MCMC, see ./EstimateMlmMcmc/EstimateMlmMcmc.R and it's html output.
@@ -258,50 +252,50 @@ Model, with treatment coefficients expressed as offsets.  For more information a
 
 ```
 
- Iterations = 1251:6250
+ Iterations = 2501:12500
  Thinning interval  = 1
- Sample size  = 5000 
+ Sample size  = 10000 
 
  DIC: 815367 
 
  G-structure:  ~CouponID
 
          post.mean l-95% CI u-95% CI eff.samp
-CouponID      6.38     4.12     8.69     4026
+CouponID      6.38     4.18     8.87     8461
 
  R-structure:  ~units
 
       post.mean l-95% CI u-95% CI eff.samp
-units      10.4     10.3     10.4     5000
+units      10.4     10.3     10.4    10000
 
  Location effects: ProbeDepth ~ 1 + Treatment 
 
                         post.mean l-95% CI u-95% CI eff.samp  pMCMC    
-(Intercept)               -6.2073  -7.2372  -5.1880     5000 <2e-04 ***
-TreatmentAcetateOnly      -0.0299  -2.2630   2.1734     5000  0.972    
-TreatmentMethane          -0.8075  -3.3131   1.5091     5000  0.507    
-TreatmentSulfideAcetate   -2.1741  -3.9497  -0.4624     5000  0.015 *  
-TreatmentSulfideOnly       0.3232  -1.2145   1.9578     5000  0.702    
+(Intercept)                -6.206   -7.196   -5.232    10000 <1e-04 ***
+TreatmentAcetateOnly       -0.020   -2.302    2.260    11119  0.989    
+TreatmentMethane           -0.786   -3.283    1.580    10000  0.529    
+TreatmentSulfideAcetate    -2.179   -3.923   -0.448    10000  0.016 *  
+TreatmentSulfideOnly        0.319   -1.312    1.843    10000  0.685    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```
                             Mean     SD Naive SE Time-series SE
-(Intercept)             -6.20903 0.5150 0.003641       0.003583
-TreatmentAcetateOnly    -0.01561 1.1440 0.008090       0.008090
-TreatmentMethane        -0.79185 1.2464 0.008813       0.008590
-TreatmentSulfideAcetate -2.18191 0.8910 0.006300       0.006269
-TreatmentSulfideOnly     0.30857 0.8164 0.005773       0.005725
+(Intercept)             -6.20575 0.5144 0.001819       0.001831
+TreatmentAcetateOnly    -0.01979 1.1520 0.004073       0.004071
+TreatmentMethane        -0.79964 1.2426 0.004393       0.004402
+TreatmentSulfideAcetate -2.17419 0.8941 0.003161       0.003156
+TreatmentSulfideOnly     0.31360 0.8130 0.002874       0.002864
 ```
 
 ```
                           2.5%  15.87%     25%      50%      75%  84.13%   97.5%
-(Intercept)             -7.211 -6.7171 -6.5499 -6.20847 -5.86343 -5.6997 -5.1892
-TreatmentAcetateOnly    -2.257 -1.1583 -0.7822 -0.01834  0.75068  1.1157  2.2184
-TreatmentMethane        -3.235 -2.0359 -1.6253 -0.79045  0.03512  0.4419  1.6690
-TreatmentSulfideAcetate -3.938 -3.0682 -2.7798 -2.18171 -1.57811 -1.2937 -0.4555
-TreatmentSulfideOnly    -1.275 -0.5032 -0.2499  0.30663  0.84983  1.1277  1.9126
+(Intercept)             -7.213 -6.7140 -6.5493 -6.20628 -5.86212 -5.6945 -5.1979
+TreatmentAcetateOnly    -2.301 -1.1556 -0.7837 -0.02211  0.74628  1.1230  2.2517
+TreatmentMethane        -3.232 -2.0367 -1.6325 -0.79877  0.03549  0.4372  1.6363
+TreatmentSulfideAcetate -3.939 -3.0606 -2.7740 -2.17217 -1.57615 -1.2906 -0.4174
+TreatmentSulfideOnly    -1.287 -0.4888 -0.2263  0.31254  0.85409  1.1183  1.9149
 ```
 
 
@@ -310,14 +304,114 @@ Model, with treatment coefficients expressed as offsets.
 
 |id                       |Treatment       |  Effect|      SE|  SELower|  SEUpper|  Coefficient|TreatmentPretty  |
 |:------------------------|:---------------|-------:|-------:|--------:|--------:|------------:|:----------------|
-|TreatmentMediaControls   |MediaControls   |  -6.209|  0.5150|   -6.717|   -5.700|     -6.20903|Media Controls   |
-|TreatmentAcetateOnly     |AcetateOnly     |  -6.225|  1.1440|   -7.367|   -5.093|     -0.01561|Acetate Only     |
-|TreatmentMethane         |Methane         |  -7.001|  1.2464|   -8.245|   -5.767|     -0.79185|Methane          |
-|TreatmentSulfideAcetate  |SulfideAcetate  |  -8.391|  0.8910|   -9.277|   -7.503|     -2.18191|Sulfide Acetate  |
-|TreatmentSulfideOnly     |SulfideOnly     |  -5.900|  0.8164|   -6.712|   -5.081|      0.30857|Sulfide Only     |
+|TreatmentMediaControls   |MediaControls   |  -6.206|  0.5144|   -6.714|   -5.695|     -6.20575|Media Controls   |
+|TreatmentAcetateOnly     |AcetateOnly     |  -6.226|  1.1520|   -7.361|   -5.083|     -0.01979|Acetate Only     |
+|TreatmentMethane         |Methane         |  -7.005|  1.2426|   -8.242|   -5.769|     -0.79964|Methane          |
+|TreatmentSulfideAcetate  |SulfideAcetate  |  -8.380|  0.8941|   -9.266|   -7.496|     -2.17419|Sulfide Acetate  |
+|TreatmentSulfideOnly     |SulfideOnly     |  -5.892|  0.8130|   -6.695|   -5.087|      0.31360|Sulfide Only     |
 
 
-## 4. Other Models (NOT to be used to Test Hypotheses)
+## 4. Unmodeled Estimates
+These estimates don't come from any model, but come from the observed slices.  They should closely corroborate the modeled estimates.  The `MeanDepth` is the weighted mean, using the histogram bins outputed by the profilometer.  The `MeanDepthV2`, `ParametricSELower`, and `ParametricSEUpper` uses a weighted `lm` estimate.  The uppoer and lower points represent a *symmetric* band, using standard error as the radius.  This contrasts with the Bayesian MLM bands, which can be assymetric, because they're from the 16% and 84% quantiles of the posterior distribution; this distance asympototically agrees with the 68% coverage of a +/-1 parametric SE band.
+
+
+```r
+dsTreatment
+```
+
+```
+       Treatment Top Bottom MeanDepth MeanDepthV2 ParametricSELower ParametricSEUpper BootSELower BootSEUpper BinCount
+1  MediaControls   0 -32.76    -6.206      -6.206            -6.312            -6.101      -6.311      -6.088      984
+2    AcetateOnly   0 -41.06    -6.222      -6.222            -6.484            -5.960      -6.555      -5.882      246
+3        Methane   0 -63.43    -7.013      -7.013            -7.281            -6.745      -7.293      -6.809      205
+4 SulfideAcetate   0 -81.48    -8.383      -8.383            -8.640            -8.127      -8.630      -8.119      492
+5    SulfideOnly   0 -30.76    -5.898      -5.898            -6.045            -5.751      -6.040      -5.737      656
+```
+
+```r
+
+dsCouponAll
+```
+
+```
+        Treatment TreatmentPretty CouponID OutlierStatus Top   Bottom MeanDepth MeanDepthV2 ParametricSELower ParametricSEUpper BootSELower BootSEUpper BinCount
+53    SulfideOnly    Sulfide Only        2        Normal   0  -20.512    -5.411      -5.411            -5.888            -4.934      -5.879      -4.890       41
+54    SulfideOnly    Sulfide Only        3        Normal   0  -24.320    -7.453      -7.453            -7.788            -7.118      -7.741      -7.177       41
+55    SulfideOnly    Sulfide Only        4        Normal   0  -13.613    -3.331      -3.331            -3.609            -3.053      -3.602      -3.030       41
+56    SulfideOnly    Sulfide Only        5        Normal   0  -25.889    -8.049      -8.049            -9.002            -7.097      -9.030      -7.151       41
+57    SulfideOnly    Sulfide Only        6        Normal   0  -30.691    -9.723      -9.723           -10.463            -8.983     -10.368      -8.871       41
+58    SulfideOnly    Sulfide Only        7        Normal   0  -16.719    -6.755      -6.755            -7.000            -6.510      -6.922      -6.433       41
+59    SulfideOnly    Sulfide Only        8        Normal   0  -14.215    -3.487      -3.487            -3.789            -3.186      -3.771      -3.233       41
+60    SulfideOnly    Sulfide Only        9        Normal   0  -21.221    -5.668      -5.668            -6.190            -5.147      -6.237      -5.189       41
+61    SulfideOnly    Sulfide Only       10        Normal   0  -25.216    -7.776      -7.776            -8.546            -7.007      -8.626      -6.888       41
+62    SulfideOnly    Sulfide Only       11        Normal   0   -6.454    -2.252      -2.252            -2.402            -2.101      -2.377      -2.117       41
+63    SulfideOnly    Sulfide Only       12        Normal   0   -7.301    -3.088      -3.088            -3.218            -2.958      -3.232      -2.974       41
+64    SulfideOnly    Sulfide Only       13        Normal   0  -16.135    -5.825      -5.825            -6.116            -5.534      -6.129      -5.510       41
+65    SulfideOnly    Sulfide Only       14        Normal   0  -14.768    -6.168      -6.168            -6.370            -5.966      -6.367      -5.979       41
+66    SulfideOnly    Sulfide Only       15        Normal   0  -30.758    -9.648      -9.648           -10.300            -8.997     -10.109      -8.927       41
+67    SulfideOnly    Sulfide Only       16        Normal   0   -9.655    -5.588      -5.588            -5.728            -5.447      -5.699      -5.463       41
+68    SulfideOnly    Sulfide Only       17        Normal   0  -30.251    -4.144      -4.144            -4.461            -3.828      -4.335      -3.892       41
+34        Methane         Methane       19        Normal   0  -63.433    -9.082      -9.082            -9.824            -8.341      -9.824      -8.355       41
+35        Methane         Methane       20        Normal   0  -16.796    -5.198      -5.198            -5.796            -4.599      -5.940      -4.660       41
+37        Methane         Methane       22        Normal   0  -46.420    -7.572      -7.572            -8.206            -6.939      -8.095      -6.963       41
+38        Methane         Methane       23        Normal   0  -32.282    -6.586      -6.586            -6.928            -6.243      -6.929      -6.378       41
+39        Methane         Methane       24        Normal   0  -25.039    -6.626      -6.626            -7.018            -6.235      -7.023      -6.260       41
+27    AcetateOnly    Acetate Only       25        Normal   0  -41.056   -12.208     -12.208           -12.882           -11.535     -12.868     -11.441       41
+28    AcetateOnly    Acetate Only       26        Normal   0  -19.614    -4.354      -4.354            -4.810            -3.898      -4.772      -3.959       41
+29    AcetateOnly    Acetate Only       27        Normal   0  -27.056    -7.015      -7.015            -7.592            -6.438      -7.539      -6.550       41
+30    AcetateOnly    Acetate Only       28        Normal   0  -16.532    -4.496      -4.496            -4.734            -4.257      -4.708      -4.284       41
+31    AcetateOnly    Acetate Only       29        Normal   0  -27.817    -5.644      -5.644            -6.022            -5.266      -5.954      -5.275       41
+32    AcetateOnly    Acetate Only       30        Normal   0  -11.228    -3.614      -3.614            -3.838            -3.391      -3.793      -3.362       41
+40 SulfideAcetate Sulfide Acetate       31        Normal   0  -21.916    -5.478      -5.478            -5.988            -4.969      -5.907      -4.918       41
+41 SulfideAcetate Sulfide Acetate       32        Normal   0  -28.428    -7.487      -7.487            -8.275            -6.700      -8.424      -6.899       41
+42 SulfideAcetate Sulfide Acetate       33        Normal   0  -45.566   -11.129     -11.129           -12.146           -10.112     -12.031      -9.863       41
+43 SulfideAcetate Sulfide Acetate       34        Normal   0  -37.230    -8.756      -8.756            -9.637            -7.875      -9.466      -7.991       41
+44 SulfideAcetate Sulfide Acetate       35        Normal   0  -40.931   -11.105     -11.105           -11.888           -10.321     -11.855     -10.383       41
+45 SulfideAcetate Sulfide Acetate       36        Normal   0  -81.479    -9.369      -9.369           -10.721            -8.018     -10.781      -8.198       41
+46 SulfideAcetate Sulfide Acetate       37        Normal   0  -13.909    -4.570      -4.570            -4.803            -4.338      -4.792      -4.300       41
+47 SulfideAcetate Sulfide Acetate       38        Normal   0  -14.988    -7.023      -7.023            -7.194            -6.853      -7.211      -6.854       41
+48 SulfideAcetate Sulfide Acetate       39        Normal   0  -12.887    -4.058      -4.058            -4.303            -3.812      -4.290      -3.827       41
+49 SulfideAcetate Sulfide Acetate       40        Normal   0  -39.414    -8.667      -8.667            -9.721            -7.613     -10.142      -7.859       41
+50 SulfideAcetate Sulfide Acetate       41        Normal   0  -51.161   -14.295     -14.295           -14.753           -13.838     -14.724     -13.945       41
+51 SulfideAcetate Sulfide Acetate       42        Normal   0  -36.154    -8.662      -8.662            -9.441            -7.882      -9.590      -8.002       41
+2   MediaControls  Media Controls       44        Normal   0  -21.367    -6.403      -6.403            -7.035            -5.772      -7.009      -5.915       41
+3   MediaControls  Media Controls       45        Normal   0  -31.145    -7.145      -7.145            -7.895            -6.395      -7.824      -6.343       41
+4   MediaControls  Media Controls       46        Normal   0  -13.868    -4.815      -4.815            -5.075            -4.555      -5.133      -4.550       41
+5   MediaControls  Media Controls       47        Normal   0  -10.357    -4.661      -4.661            -4.875            -4.447      -4.869      -4.452       41
+6   MediaControls  Media Controls       48        Normal   0   -7.235    -2.840      -2.840            -2.976            -2.704      -2.969      -2.687       41
+7   MediaControls  Media Controls       49        Normal   0  -20.108    -3.539      -3.539            -3.948            -3.129      -3.862      -3.212       41
+9   MediaControls  Media Controls       51        Normal   0  -18.279    -4.796      -4.796            -4.949            -4.643      -4.938      -4.659       41
+10  MediaControls  Media Controls       52        Normal   0  -28.995    -8.258      -8.258            -8.502            -8.014      -8.469      -8.062       41
+11  MediaControls  Media Controls       53        Normal   0  -29.832    -9.298      -9.298           -10.024            -8.572      -9.986      -8.549       41
+12  MediaControls  Media Controls       54        Normal   0  -24.437    -8.835      -8.835            -9.175            -8.496      -9.194      -8.598       41
+13  MediaControls  Media Controls       55        Normal   0  -17.564    -5.875      -5.875            -6.165            -5.586      -6.190      -5.559       41
+14  MediaControls  Media Controls       56        Normal   0  -18.818    -6.773      -6.773            -7.206            -6.340      -7.275      -6.277       41
+15  MediaControls  Media Controls       57        Normal   0  -11.382    -3.566      -3.566            -3.764            -3.369      -3.789      -3.352       41
+16  MediaControls  Media Controls       58        Normal   0  -13.818    -4.454      -4.454            -4.699            -4.208      -4.701      -4.196       41
+17  MediaControls  Media Controls       59        Normal   0  -19.905    -6.986      -6.986            -7.172            -6.800      -7.149      -6.809       41
+18  MediaControls  Media Controls       60        Normal   0  -12.300    -5.726      -5.726            -5.880            -5.571      -5.865      -5.550       41
+19  MediaControls  Media Controls       61        Normal   0  -27.962   -10.980     -10.980           -11.262           -10.697     -11.253     -10.673       41
+20  MediaControls  Media Controls       62        Normal   0  -15.966    -4.491      -4.491            -4.787            -4.195      -4.731      -4.157       41
+21  MediaControls  Media Controls       63        Normal   0  -11.111    -3.942      -3.942            -4.166            -3.718      -4.187      -3.719       41
+22  MediaControls  Media Controls       64        Normal   0  -11.314    -4.204      -4.204            -4.421            -3.987      -4.429      -4.015       41
+23  MediaControls  Media Controls       65        Normal   0  -22.109    -7.581      -7.581            -7.769            -7.393      -7.806      -7.428       41
+24  MediaControls  Media Controls       66        Normal   0  -32.762   -11.386     -11.386           -12.022           -10.750     -11.866     -10.828       41
+25  MediaControls  Media Controls       67        Normal   0  -17.107    -7.795      -7.795            -8.048            -7.541      -8.136      -7.500       41
+26  MediaControls  Media Controls       68        Normal   0  -16.001    -4.604      -4.604            -4.888            -4.319      -4.868      -4.351       41
+52    SulfideOnly    Sulfide Only        1        Conoco   0  -88.992   -37.918     -37.918           -39.162           -36.673     -39.287     -36.519       41
+33        Methane         Methane       18        Conoco   0 -127.262   -42.975     -42.975           -44.054           -41.896     -44.309     -42.214       41
+36        Methane         Methane       21        Conoco   0 -139.073   -31.978     -31.978           -33.146           -30.809     -32.987     -30.952       41
+1   MediaControls  Media Controls       43        Conoco   0  -60.976   -10.417     -10.417           -11.731            -9.102     -11.861      -9.109       41
+8   MediaControls  Media Controls       50       Extreme   0  -52.814   -24.581     -24.581           -25.216           -23.947     -25.280     -23.927       41
+```
+
+```r
+
+############################
+```
+
+
+## 5. Other Models (NOT to be used to Test Hypotheses)
 These models are mostly to check the validity & bounds for the MLM estimates in the previous section.  Notice the point estimates for each treatment are very similar (to each other and to the previous MLM).  But the standard errors and *p*-values are very different for the 'no pooling' model, and would lead to different conclusions.  The results for the MLM and pooled
 
 
@@ -453,11 +547,19 @@ Fixed effects:
 ```
 
 ```r
-anova(m, mNoTreatmentMlm)
+anova(mFrequentist, mNoTreatmentMlm)
 ```
 
 ```
-Error: object 'm' not found
+Data: dsProbe
+Models:
+mNoTreatmentMlm: ProbeDepth ~ 1 + (1 | CouponID)
+mFrequentist: ProbeDepth ~ 1 + Treatment + (1 | CouponID)
+                Df    AIC    BIC  logLik deviance Chisq Chi Df Pr(>Chisq)  
+mNoTreatmentMlm  3 815771 815801 -407883   815765                          
+mFrequentist     7 815771 815841 -407879   815757  8.48      4      0.076 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```r
@@ -612,7 +714,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-15, 08:25:38 -0600
+Report created by Will at 2014-02-15, 13:44:51 -0600
 ```
 
 ```
@@ -620,20 +722,18 @@ R Under development (unstable) (2014-02-10 r64961)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 
 locale:
-[1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252    LC_MONETARY=English_United States.1252
-[4] LC_NUMERIC=C                           LC_TIME=English_United States.1252    
+[1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252    LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.1252    
 
 attached base packages:
 [1] grid      stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] MCMCglmm_2.17      corpcor_1.6.6      ape_3.0-11         coda_0.16-1        tensorA_0.36       arm_1.6-10        
- [7] MASS_7.3-29        lme4_1.0-6         Matrix_1.1-0       lattice_0.20-24    boot_1.3-9         ggplot2_0.9.3.1   
-[13] gridExtra_0.9.1    plyr_1.8.0.99      RColorBrewer_1.0-5 testit_0.3         knitr_1.5         
+ [1] MCMCglmm_2.17      corpcor_1.6.6      ape_3.0-11         coda_0.16-1        tensorA_0.36       arm_1.6-10         MASS_7.3-29        lme4_1.0-6         Matrix_1.1-0      
+[10] lattice_0.20-24    boot_1.3-9         ggplot2_0.9.3.1    gridExtra_0.9.1    plyr_1.8.0.99      RColorBrewer_1.0-5 testit_0.3         knitr_1.5         
 
 loaded via a namespace (and not attached):
- [1] abind_1.4-0      colorspace_1.2-4 dichromat_2.0-0  digest_0.6.4     evaluate_0.5.1   formatR_0.10    
- [7] gtable_0.1.2     labeling_0.2     minqa_1.2.3      munsell_0.4.2    nlme_3.1-113     proto_0.3-10    
-[13] Rcpp_0.11.0      reshape2_1.2.2   scales_0.2.3     splines_3.1.0    stringr_0.6.2    tools_3.1.0     
+ [1] abind_1.4-0      colorspace_1.2-4 dichromat_2.0-0  digest_0.6.4     evaluate_0.5.1   formatR_0.10     gtable_0.1.2     labeling_0.2     minqa_1.2.3      munsell_0.4.2   
+[11] nlme_3.1-113     proto_0.3-10     Rcpp_0.11.0      reshape2_1.2.2   scales_0.2.3     splines_3.1.0    stringr_0.6.2    tools_3.1.0     
 ```
 

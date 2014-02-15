@@ -34,11 +34,11 @@
 
 
 ## 1. Parameters
-**chainCount**: 4
+**chainCount**: 8
 
-**iterationCount**: 5000 (The number used for estimate -ie, it doesn't include burn-in.)
+**iterationCount**: 10000 (The number used for estimate -ie, it doesn't include burn-in.)
 
-**burninCount**: 1250
+**burninCount**: 2500
 
 
 
@@ -63,19 +63,17 @@
 
                       MCMC iteration = 6000
 
-                      MCMC iteration = 0
+                      MCMC iteration = 7000
 
-                      MCMC iteration = 1000
+                      MCMC iteration = 8000
 
-                      MCMC iteration = 2000
+                      MCMC iteration = 9000
 
-                      MCMC iteration = 3000
+                      MCMC iteration = 10000
 
-                      MCMC iteration = 4000
+                      MCMC iteration = 11000
 
-                      MCMC iteration = 5000
-
-                      MCMC iteration = 6000
+                      MCMC iteration = 12000
 
                       MCMC iteration = 0
 
@@ -91,6 +89,18 @@
 
                       MCMC iteration = 6000
 
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
+
                       MCMC iteration = 0
 
                       MCMC iteration = 1000
@@ -104,67 +114,209 @@
                       MCMC iteration = 5000
 
                       MCMC iteration = 6000
+
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
+
+                      MCMC iteration = 0
+
+                      MCMC iteration = 1000
+
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
+
+                      MCMC iteration = 0
+
+                      MCMC iteration = 1000
+
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
+
+                      MCMC iteration = 0
+
+                      MCMC iteration = 1000
+
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
+
+                      MCMC iteration = 0
+
+                      MCMC iteration = 1000
+
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
+
+                      MCMC iteration = 0
+
+                      MCMC iteration = 1000
+
+                      MCMC iteration = 2000
+
+                      MCMC iteration = 3000
+
+                      MCMC iteration = 4000
+
+                      MCMC iteration = 5000
+
+                      MCMC iteration = 6000
+
+                      MCMC iteration = 7000
+
+                      MCMC iteration = 8000
+
+                      MCMC iteration = 9000
+
+                      MCMC iteration = 10000
+
+                      MCMC iteration = 11000
+
+                      MCMC iteration = 12000
 ```
 
 ```
-Time difference of 13.72 mins
+Time difference of 3.51 hours
 ```
 
 ```
 
- Iterations = 1251:6250
+ Iterations = 2501:12500
  Thinning interval  = 1
- Sample size  = 5000 
+ Sample size  = 10000 
 
  DIC: 815367 
 
  G-structure:  ~CouponID
 
          post.mean l-95% CI u-95% CI eff.samp
-CouponID      6.38     4.12     8.69     4026
+CouponID      6.38     4.18     8.87     8461
 
  R-structure:  ~units
 
       post.mean l-95% CI u-95% CI eff.samp
-units      10.4     10.3     10.4     5000
+units      10.4     10.3     10.4    10000
 
  Location effects: ProbeDepth ~ 1 + Treatment 
 
                         post.mean l-95% CI u-95% CI eff.samp  pMCMC    
-(Intercept)               -6.2073  -7.2372  -5.1880     5000 <2e-04 ***
-TreatmentAcetateOnly      -0.0299  -2.2630   2.1734     5000  0.972    
-TreatmentMethane          -0.8075  -3.3131   1.5091     5000  0.507    
-TreatmentSulfideAcetate   -2.1741  -3.9497  -0.4624     5000  0.015 *  
-TreatmentSulfideOnly       0.3232  -1.2145   1.9578     5000  0.702    
+(Intercept)                -6.206   -7.196   -5.232    10000 <1e-04 ***
+TreatmentAcetateOnly       -0.020   -2.302    2.260    11119  0.989    
+TreatmentMethane           -0.786   -3.283    1.580    10000  0.529    
+TreatmentSulfideAcetate    -2.179   -3.923   -0.448    10000  0.016 *  
+TreatmentSulfideOnly        0.319   -1.312    1.843    10000  0.685    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ```
 
-Iterations = 1251:6250
+Iterations = 2501:12500
 Thinning interval = 1 
-Number of chains = 4 
-Sample size per chain = 5000 
+Number of chains = 8 
+Sample size per chain = 10000 
 
 1. Empirical mean and standard deviation for each variable,
    plus standard error of the mean:
 
                            Mean    SD Naive SE Time-series SE
-(Intercept)             -6.2090 0.515  0.00364        0.00358
-TreatmentAcetateOnly    -0.0156 1.144  0.00809        0.00809
-TreatmentMethane        -0.7918 1.246  0.00881        0.00859
-TreatmentSulfideAcetate -2.1819 0.891  0.00630        0.00627
-TreatmentSulfideOnly     0.3086 0.816  0.00577        0.00573
+(Intercept)             -6.2058 0.514  0.00182        0.00183
+TreatmentAcetateOnly    -0.0198 1.152  0.00407        0.00407
+TreatmentMethane        -0.7996 1.243  0.00439        0.00440
+TreatmentSulfideAcetate -2.1742 0.894  0.00316        0.00316
+TreatmentSulfideOnly     0.3136 0.813  0.00287        0.00286
 
 2. Quantiles for each variable:
 
                          2.5% 15.87%    25%     50%     75% 84.13%  97.5%
-(Intercept)             -7.21 -6.717 -6.550 -6.2085 -5.8634 -5.700 -5.189
-TreatmentAcetateOnly    -2.26 -1.158 -0.782 -0.0183  0.7507  1.116  2.218
-TreatmentMethane        -3.23 -2.036 -1.625 -0.7904  0.0351  0.442  1.669
-TreatmentSulfideAcetate -3.94 -3.068 -2.780 -2.1817 -1.5781 -1.294 -0.456
-TreatmentSulfideOnly    -1.27 -0.503 -0.250  0.3066  0.8498  1.128  1.913
+(Intercept)             -7.21 -6.714 -6.549 -6.2063 -5.8621 -5.695 -5.198
+TreatmentAcetateOnly    -2.30 -1.156 -0.784 -0.0221  0.7463  1.123  2.252
+TreatmentMethane        -3.23 -2.037 -1.632 -0.7988  0.0355  0.437  1.636
+TreatmentSulfideAcetate -3.94 -3.061 -2.774 -2.1722 -1.5762 -1.291 -0.417
+TreatmentSulfideOnly    -1.29 -0.489 -0.226  0.3125  0.8541  1.118  1.915
 ```
 
 ```
@@ -194,7 +346,7 @@ Effective Size:
 
 ```
             (Intercept)    TreatmentAcetateOnly        TreatmentMethane TreatmentSulfideAcetate    TreatmentSulfideOnly 
-                  20692                   20000                   21080                   20206                   20354 
+                  78964                   80226                   79827                   80289                   80756 
 ```
 
 
@@ -219,7 +371,7 @@ Error: subscript out of bounds
 
 
 ```
-Warning: Removed 20 rows containing missing values (geom_point).
+Warning: Removed 8 rows containing missing values (geom_point).
 ```
 
 ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll1.png) ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll2.png) ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll3.png) ![plot of chunk GraphJagsAll](FigureDiagnosisRmd/GraphJagsAll4.png) 
@@ -243,7 +395,7 @@ function( x ) {
 ## --Session Info--
 
 ```
-Report created by Will at 2014-02-15, 01:27:03 -0600
+Report created by Will at 2014-02-15, 11:58:28 -0600
 ```
 
 ```
