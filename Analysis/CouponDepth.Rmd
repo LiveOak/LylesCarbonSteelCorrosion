@@ -15,7 +15,7 @@ opts_chunk$set(
     results='show', 
     comment = NA, 
     tidy = FALSE,
-    dpi = 100,
+#     dev = "pdf", #Uncomment this to produce pdfs for publication images (though they don't render well in the html report)
     fig.width = 7, 
     fig.height = 4, 
     fig.path = 'figure_raw/'
@@ -64,7 +64,7 @@ The diamonds/means for `AcetateOnly` and `MediaControls` are on top of each othe
 ## 2. Coupon Summary Boxplot
 The first boxplot shows all points; the four coupons processed on ConocoPhillips machine are marked with a regular triangle.  Another suspicious coupon (in `MediaControls`) is marked with an upside-down triangle.  The second boxplot excludes those five coupons; notice the scale of the *y*-axis has changed.
 
-```{r CouponSummaryBoxplot, echo=echoChunks, results='asis', message=TRUE}
+```{r CouponSummaryBoxplot, echo=echoChunks, results='asis', message=TRUE, fig.width=7.5}
 ```
 
 ## 3. Estimates from Bayesian MLM (multilevel model) to Test Hypotheses

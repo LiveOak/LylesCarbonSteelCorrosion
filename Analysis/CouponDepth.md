@@ -14,14 +14,21 @@ opts_knit$set(root.dir = "../")
 
 ```r
 require(knitr)
-opts_chunk$set(results = "show", comment = NA, tidy = FALSE, dpi = 100, fig.width = 7, 
-    fig.height = 4, fig.path = "figure_raw/")
-# dpi = 400 out.width = '600px', #This affects only the markdown, not the
-# underlying png file.  The height will be scaled appropriately.
+opts_chunk$set(
+    results='show', 
+    comment = NA, 
+    tidy = FALSE,
+#     dev = "pdf", #Uncomment this to produce pdfs for publication images (though they don't render well in the html report)
+    fig.width = 7, 
+    fig.height = 4, 
+    fig.path = 'figure_raw/'
+)
+#     dpi = 400
+#     out.width = "600px", #This affects only the markdown, not the underlying png file.  The height will be scaled appropriately.
 
 echoChunks <- TRUE
-options(width = 180)  #Widen the text output from the default of 80 characters.
-read_chunk("./Analysis/CouponDepth.R")
+options(width=180) #Widen the text output from the default of 80 characters.
+read_chunk("./Analysis/CouponDepth.R") 
 ```
 
 <!-- Load the packages.  Suppress the output when loading packages. --> 
@@ -225,7 +232,7 @@ gBoxAll <- ggplot(dsCouponAll, aes(x=TreatmentPretty, y=MeanDepth, color=Treatme
   scale_shape_manual(values=shapeOutlier) +
   reportTheme +
   guides(color="none", fill="none", shape="none") +
-  labs(title="Includes Five Outliers", x=NULL, y=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)))
+  labs(title="Includes Five Outliers", x=NULL, y=expression(Surface*phantom(1)*Damage*phantom(1)*(mu*m)))
 # gBoxAll
 
 set.seed(seed=9789) #Set a seed so the jittered graphs are consistent across renders.
@@ -321,11 +328,11 @@ dsTreatment
 
 ```
        Treatment Top Bottom MeanDepth MeanDepthV2 ParametricSELower ParametricSEUpper BootSELower BootSEUpper BinCount
-1  MediaControls   0 -32.76    -6.206      -6.206            -6.312            -6.101      -6.311      -6.088      984
-2    AcetateOnly   0 -41.06    -6.222      -6.222            -6.484            -5.960      -6.555      -5.882      246
-3        Methane   0 -63.43    -7.013      -7.013            -7.281            -6.745      -7.293      -6.809      205
-4 SulfideAcetate   0 -81.48    -8.383      -8.383            -8.640            -8.127      -8.630      -8.119      492
-5    SulfideOnly   0 -30.76    -5.898      -5.898            -6.045            -5.751      -6.040      -5.737      656
+1  MediaControls   0 -32.76    -6.206      -6.206            -6.312            -6.101      -6.314      -6.088      984
+2    AcetateOnly   0 -41.06    -6.222      -6.222            -6.484            -5.960      -6.527      -5.927      246
+3        Methane   0 -63.43    -7.013      -7.013            -7.281            -6.745      -7.277      -6.731      205
+4 SulfideAcetate   0 -81.48    -8.383      -8.383            -8.640            -8.127      -8.622      -8.143      492
+5    SulfideOnly   0 -30.76    -5.898      -5.898            -6.045            -5.751      -6.045      -5.756      656
 ```
 
 ```r
@@ -335,74 +342,74 @@ dsCouponAll
 
 ```
         Treatment TreatmentPretty CouponID OutlierStatus Top   Bottom MeanDepth MeanDepthV2 ParametricSELower ParametricSEUpper BootSELower BootSEUpper BinCount
-53    SulfideOnly    Sulfide Only        2        Normal   0  -20.512    -5.411      -5.411            -5.888            -4.934      -5.879      -4.890       41
-54    SulfideOnly    Sulfide Only        3        Normal   0  -24.320    -7.453      -7.453            -7.788            -7.118      -7.741      -7.177       41
-55    SulfideOnly    Sulfide Only        4        Normal   0  -13.613    -3.331      -3.331            -3.609            -3.053      -3.602      -3.030       41
-56    SulfideOnly    Sulfide Only        5        Normal   0  -25.889    -8.049      -8.049            -9.002            -7.097      -9.030      -7.151       41
-57    SulfideOnly    Sulfide Only        6        Normal   0  -30.691    -9.723      -9.723           -10.463            -8.983     -10.368      -8.871       41
-58    SulfideOnly    Sulfide Only        7        Normal   0  -16.719    -6.755      -6.755            -7.000            -6.510      -6.922      -6.433       41
-59    SulfideOnly    Sulfide Only        8        Normal   0  -14.215    -3.487      -3.487            -3.789            -3.186      -3.771      -3.233       41
-60    SulfideOnly    Sulfide Only        9        Normal   0  -21.221    -5.668      -5.668            -6.190            -5.147      -6.237      -5.189       41
-61    SulfideOnly    Sulfide Only       10        Normal   0  -25.216    -7.776      -7.776            -8.546            -7.007      -8.626      -6.888       41
-62    SulfideOnly    Sulfide Only       11        Normal   0   -6.454    -2.252      -2.252            -2.402            -2.101      -2.377      -2.117       41
-63    SulfideOnly    Sulfide Only       12        Normal   0   -7.301    -3.088      -3.088            -3.218            -2.958      -3.232      -2.974       41
-64    SulfideOnly    Sulfide Only       13        Normal   0  -16.135    -5.825      -5.825            -6.116            -5.534      -6.129      -5.510       41
-65    SulfideOnly    Sulfide Only       14        Normal   0  -14.768    -6.168      -6.168            -6.370            -5.966      -6.367      -5.979       41
-66    SulfideOnly    Sulfide Only       15        Normal   0  -30.758    -9.648      -9.648           -10.300            -8.997     -10.109      -8.927       41
-67    SulfideOnly    Sulfide Only       16        Normal   0   -9.655    -5.588      -5.588            -5.728            -5.447      -5.699      -5.463       41
-68    SulfideOnly    Sulfide Only       17        Normal   0  -30.251    -4.144      -4.144            -4.461            -3.828      -4.335      -3.892       41
-34        Methane         Methane       19        Normal   0  -63.433    -9.082      -9.082            -9.824            -8.341      -9.824      -8.355       41
-35        Methane         Methane       20        Normal   0  -16.796    -5.198      -5.198            -5.796            -4.599      -5.940      -4.660       41
-37        Methane         Methane       22        Normal   0  -46.420    -7.572      -7.572            -8.206            -6.939      -8.095      -6.963       41
-38        Methane         Methane       23        Normal   0  -32.282    -6.586      -6.586            -6.928            -6.243      -6.929      -6.378       41
-39        Methane         Methane       24        Normal   0  -25.039    -6.626      -6.626            -7.018            -6.235      -7.023      -6.260       41
-27    AcetateOnly    Acetate Only       25        Normal   0  -41.056   -12.208     -12.208           -12.882           -11.535     -12.868     -11.441       41
-28    AcetateOnly    Acetate Only       26        Normal   0  -19.614    -4.354      -4.354            -4.810            -3.898      -4.772      -3.959       41
-29    AcetateOnly    Acetate Only       27        Normal   0  -27.056    -7.015      -7.015            -7.592            -6.438      -7.539      -6.550       41
-30    AcetateOnly    Acetate Only       28        Normal   0  -16.532    -4.496      -4.496            -4.734            -4.257      -4.708      -4.284       41
-31    AcetateOnly    Acetate Only       29        Normal   0  -27.817    -5.644      -5.644            -6.022            -5.266      -5.954      -5.275       41
-32    AcetateOnly    Acetate Only       30        Normal   0  -11.228    -3.614      -3.614            -3.838            -3.391      -3.793      -3.362       41
-40 SulfideAcetate Sulfide Acetate       31        Normal   0  -21.916    -5.478      -5.478            -5.988            -4.969      -5.907      -4.918       41
-41 SulfideAcetate Sulfide Acetate       32        Normal   0  -28.428    -7.487      -7.487            -8.275            -6.700      -8.424      -6.899       41
-42 SulfideAcetate Sulfide Acetate       33        Normal   0  -45.566   -11.129     -11.129           -12.146           -10.112     -12.031      -9.863       41
-43 SulfideAcetate Sulfide Acetate       34        Normal   0  -37.230    -8.756      -8.756            -9.637            -7.875      -9.466      -7.991       41
-44 SulfideAcetate Sulfide Acetate       35        Normal   0  -40.931   -11.105     -11.105           -11.888           -10.321     -11.855     -10.383       41
-45 SulfideAcetate Sulfide Acetate       36        Normal   0  -81.479    -9.369      -9.369           -10.721            -8.018     -10.781      -8.198       41
-46 SulfideAcetate Sulfide Acetate       37        Normal   0  -13.909    -4.570      -4.570            -4.803            -4.338      -4.792      -4.300       41
-47 SulfideAcetate Sulfide Acetate       38        Normal   0  -14.988    -7.023      -7.023            -7.194            -6.853      -7.211      -6.854       41
-48 SulfideAcetate Sulfide Acetate       39        Normal   0  -12.887    -4.058      -4.058            -4.303            -3.812      -4.290      -3.827       41
-49 SulfideAcetate Sulfide Acetate       40        Normal   0  -39.414    -8.667      -8.667            -9.721            -7.613     -10.142      -7.859       41
-50 SulfideAcetate Sulfide Acetate       41        Normal   0  -51.161   -14.295     -14.295           -14.753           -13.838     -14.724     -13.945       41
-51 SulfideAcetate Sulfide Acetate       42        Normal   0  -36.154    -8.662      -8.662            -9.441            -7.882      -9.590      -8.002       41
-2   MediaControls  Media Controls       44        Normal   0  -21.367    -6.403      -6.403            -7.035            -5.772      -7.009      -5.915       41
-3   MediaControls  Media Controls       45        Normal   0  -31.145    -7.145      -7.145            -7.895            -6.395      -7.824      -6.343       41
-4   MediaControls  Media Controls       46        Normal   0  -13.868    -4.815      -4.815            -5.075            -4.555      -5.133      -4.550       41
-5   MediaControls  Media Controls       47        Normal   0  -10.357    -4.661      -4.661            -4.875            -4.447      -4.869      -4.452       41
-6   MediaControls  Media Controls       48        Normal   0   -7.235    -2.840      -2.840            -2.976            -2.704      -2.969      -2.687       41
-7   MediaControls  Media Controls       49        Normal   0  -20.108    -3.539      -3.539            -3.948            -3.129      -3.862      -3.212       41
-9   MediaControls  Media Controls       51        Normal   0  -18.279    -4.796      -4.796            -4.949            -4.643      -4.938      -4.659       41
-10  MediaControls  Media Controls       52        Normal   0  -28.995    -8.258      -8.258            -8.502            -8.014      -8.469      -8.062       41
-11  MediaControls  Media Controls       53        Normal   0  -29.832    -9.298      -9.298           -10.024            -8.572      -9.986      -8.549       41
-12  MediaControls  Media Controls       54        Normal   0  -24.437    -8.835      -8.835            -9.175            -8.496      -9.194      -8.598       41
-13  MediaControls  Media Controls       55        Normal   0  -17.564    -5.875      -5.875            -6.165            -5.586      -6.190      -5.559       41
-14  MediaControls  Media Controls       56        Normal   0  -18.818    -6.773      -6.773            -7.206            -6.340      -7.275      -6.277       41
-15  MediaControls  Media Controls       57        Normal   0  -11.382    -3.566      -3.566            -3.764            -3.369      -3.789      -3.352       41
-16  MediaControls  Media Controls       58        Normal   0  -13.818    -4.454      -4.454            -4.699            -4.208      -4.701      -4.196       41
-17  MediaControls  Media Controls       59        Normal   0  -19.905    -6.986      -6.986            -7.172            -6.800      -7.149      -6.809       41
-18  MediaControls  Media Controls       60        Normal   0  -12.300    -5.726      -5.726            -5.880            -5.571      -5.865      -5.550       41
-19  MediaControls  Media Controls       61        Normal   0  -27.962   -10.980     -10.980           -11.262           -10.697     -11.253     -10.673       41
-20  MediaControls  Media Controls       62        Normal   0  -15.966    -4.491      -4.491            -4.787            -4.195      -4.731      -4.157       41
-21  MediaControls  Media Controls       63        Normal   0  -11.111    -3.942      -3.942            -4.166            -3.718      -4.187      -3.719       41
-22  MediaControls  Media Controls       64        Normal   0  -11.314    -4.204      -4.204            -4.421            -3.987      -4.429      -4.015       41
-23  MediaControls  Media Controls       65        Normal   0  -22.109    -7.581      -7.581            -7.769            -7.393      -7.806      -7.428       41
-24  MediaControls  Media Controls       66        Normal   0  -32.762   -11.386     -11.386           -12.022           -10.750     -11.866     -10.828       41
-25  MediaControls  Media Controls       67        Normal   0  -17.107    -7.795      -7.795            -8.048            -7.541      -8.136      -7.500       41
-26  MediaControls  Media Controls       68        Normal   0  -16.001    -4.604      -4.604            -4.888            -4.319      -4.868      -4.351       41
-52    SulfideOnly    Sulfide Only        1        Conoco   0  -88.992   -37.918     -37.918           -39.162           -36.673     -39.287     -36.519       41
-33        Methane         Methane       18        Conoco   0 -127.262   -42.975     -42.975           -44.054           -41.896     -44.309     -42.214       41
-36        Methane         Methane       21        Conoco   0 -139.073   -31.978     -31.978           -33.146           -30.809     -32.987     -30.952       41
-1   MediaControls  Media Controls       43        Conoco   0  -60.976   -10.417     -10.417           -11.731            -9.102     -11.861      -9.109       41
-8   MediaControls  Media Controls       50       Extreme   0  -52.814   -24.581     -24.581           -25.216           -23.947     -25.280     -23.927       41
+53    SulfideOnly    Sulfide Only        2        Normal   0  -20.512    -5.411      -5.411            -5.888            -4.934      -5.954      -4.865       41
+54    SulfideOnly    Sulfide Only        3        Normal   0  -24.320    -7.453      -7.453            -7.788            -7.118      -7.652      -7.059       41
+55    SulfideOnly    Sulfide Only        4        Normal   0  -13.613    -3.331      -3.331            -3.609            -3.053      -3.586      -3.046       41
+56    SulfideOnly    Sulfide Only        5        Normal   0  -25.889    -8.049      -8.049            -9.002            -7.097      -9.140      -7.246       41
+57    SulfideOnly    Sulfide Only        6        Normal   0  -30.691    -9.723      -9.723           -10.463            -8.983     -10.574      -8.964       41
+58    SulfideOnly    Sulfide Only        7        Normal   0  -16.719    -6.755      -6.755            -7.000            -6.510      -7.075      -6.565       41
+59    SulfideOnly    Sulfide Only        8        Normal   0  -14.215    -3.487      -3.487            -3.789            -3.186      -3.736      -3.181       41
+60    SulfideOnly    Sulfide Only        9        Normal   0  -21.221    -5.668      -5.668            -6.190            -5.147      -6.224      -5.202       41
+61    SulfideOnly    Sulfide Only       10        Normal   0  -25.216    -7.776      -7.776            -8.546            -7.007      -8.349      -6.935       41
+62    SulfideOnly    Sulfide Only       11        Normal   0   -6.454    -2.252      -2.252            -2.402            -2.101      -2.420      -2.105       41
+63    SulfideOnly    Sulfide Only       12        Normal   0   -7.301    -3.088      -3.088            -3.218            -2.958      -3.183      -2.938       41
+64    SulfideOnly    Sulfide Only       13        Normal   0  -16.135    -5.825      -5.825            -6.116            -5.534      -6.090      -5.559       41
+65    SulfideOnly    Sulfide Only       14        Normal   0  -14.768    -6.168      -6.168            -6.370            -5.966      -6.349      -5.997       41
+66    SulfideOnly    Sulfide Only       15        Normal   0  -30.758    -9.648      -9.648           -10.300            -8.997     -10.203      -9.190       41
+67    SulfideOnly    Sulfide Only       16        Normal   0   -9.655    -5.588      -5.588            -5.728            -5.447      -5.710      -5.446       41
+68    SulfideOnly    Sulfide Only       17        Normal   0  -30.251    -4.144      -4.144            -4.461            -3.828      -4.390      -3.929       41
+34        Methane         Methane       19        Normal   0  -63.433    -9.082      -9.082            -9.824            -8.341      -9.747      -8.393       41
+35        Methane         Methane       20        Normal   0  -16.796    -5.198      -5.198            -5.796            -4.599      -5.889      -4.639       41
+37        Methane         Methane       22        Normal   0  -46.420    -7.572      -7.572            -8.206            -6.939      -8.180      -7.048       41
+38        Methane         Methane       23        Normal   0  -32.282    -6.586      -6.586            -6.928            -6.243      -6.929      -6.319       41
+39        Methane         Methane       24        Normal   0  -25.039    -6.626      -6.626            -7.018            -6.235      -7.054      -6.214       41
+27    AcetateOnly    Acetate Only       25        Normal   0  -41.056   -12.208     -12.208           -12.882           -11.535     -12.742     -11.391       41
+28    AcetateOnly    Acetate Only       26        Normal   0  -19.614    -4.354      -4.354            -4.810            -3.898      -4.784      -3.863       41
+29    AcetateOnly    Acetate Only       27        Normal   0  -27.056    -7.015      -7.015            -7.592            -6.438      -7.572      -6.319       41
+30    AcetateOnly    Acetate Only       28        Normal   0  -16.532    -4.496      -4.496            -4.734            -4.257      -4.677      -4.274       41
+31    AcetateOnly    Acetate Only       29        Normal   0  -27.817    -5.644      -5.644            -6.022            -5.266      -6.038      -5.224       41
+32    AcetateOnly    Acetate Only       30        Normal   0  -11.228    -3.614      -3.614            -3.838            -3.391      -3.848      -3.355       41
+40 SulfideAcetate Sulfide Acetate       31        Normal   0  -21.916    -5.478      -5.478            -5.988            -4.969      -5.920      -4.971       41
+41 SulfideAcetate Sulfide Acetate       32        Normal   0  -28.428    -7.487      -7.487            -8.275            -6.700      -8.251      -6.795       41
+42 SulfideAcetate Sulfide Acetate       33        Normal   0  -45.566   -11.129     -11.129           -12.146           -10.112     -11.975     -10.197       41
+43 SulfideAcetate Sulfide Acetate       34        Normal   0  -37.230    -8.756      -8.756            -9.637            -7.875      -9.444      -7.741       41
+44 SulfideAcetate Sulfide Acetate       35        Normal   0  -40.931   -11.105     -11.105           -11.888           -10.321     -11.830     -10.208       41
+45 SulfideAcetate Sulfide Acetate       36        Normal   0  -81.479    -9.369      -9.369           -10.721            -8.018     -10.483      -7.999       41
+46 SulfideAcetate Sulfide Acetate       37        Normal   0  -13.909    -4.570      -4.570            -4.803            -4.338      -4.783      -4.351       41
+47 SulfideAcetate Sulfide Acetate       38        Normal   0  -14.988    -7.023      -7.023            -7.194            -6.853      -7.137      -6.836       41
+48 SulfideAcetate Sulfide Acetate       39        Normal   0  -12.887    -4.058      -4.058            -4.303            -3.812      -4.298      -3.835       41
+49 SulfideAcetate Sulfide Acetate       40        Normal   0  -39.414    -8.667      -8.667            -9.721            -7.613      -9.830      -7.619       41
+50 SulfideAcetate Sulfide Acetate       41        Normal   0  -51.161   -14.295     -14.295           -14.753           -13.838     -14.662     -13.882       41
+51 SulfideAcetate Sulfide Acetate       42        Normal   0  -36.154    -8.662      -8.662            -9.441            -7.882      -9.656      -7.958       41
+2   MediaControls  Media Controls       44        Normal   0  -21.367    -6.403      -6.403            -7.035            -5.772      -7.166      -5.798       41
+3   MediaControls  Media Controls       45        Normal   0  -31.145    -7.145      -7.145            -7.895            -6.395      -7.938      -6.419       41
+4   MediaControls  Media Controls       46        Normal   0  -13.868    -4.815      -4.815            -5.075            -4.555      -4.998      -4.524       41
+5   MediaControls  Media Controls       47        Normal   0  -10.357    -4.661      -4.661            -4.875            -4.447      -4.863      -4.377       41
+6   MediaControls  Media Controls       48        Normal   0   -7.235    -2.840      -2.840            -2.976            -2.704      -2.982      -2.722       41
+7   MediaControls  Media Controls       49        Normal   0  -20.108    -3.539      -3.539            -3.948            -3.129      -3.923      -3.065       41
+9   MediaControls  Media Controls       51        Normal   0  -18.279    -4.796      -4.796            -4.949            -4.643      -4.882      -4.637       41
+10  MediaControls  Media Controls       52        Normal   0  -28.995    -8.258      -8.258            -8.502            -8.014      -8.486      -7.991       41
+11  MediaControls  Media Controls       53        Normal   0  -29.832    -9.298      -9.298           -10.024            -8.572     -10.205      -8.549       41
+12  MediaControls  Media Controls       54        Normal   0  -24.437    -8.835      -8.835            -9.175            -8.496      -9.134      -8.508       41
+13  MediaControls  Media Controls       55        Normal   0  -17.564    -5.875      -5.875            -6.165            -5.586      -6.115      -5.569       41
+14  MediaControls  Media Controls       56        Normal   0  -18.818    -6.773      -6.773            -7.206            -6.340      -7.252      -6.380       41
+15  MediaControls  Media Controls       57        Normal   0  -11.382    -3.566      -3.566            -3.764            -3.369      -3.803      -3.408       41
+16  MediaControls  Media Controls       58        Normal   0  -13.818    -4.454      -4.454            -4.699            -4.208      -4.727      -4.288       41
+17  MediaControls  Media Controls       59        Normal   0  -19.905    -6.986      -6.986            -7.172            -6.800      -7.222      -6.785       41
+18  MediaControls  Media Controls       60        Normal   0  -12.300    -5.726      -5.726            -5.880            -5.571      -5.857      -5.557       41
+19  MediaControls  Media Controls       61        Normal   0  -27.962   -10.980     -10.980           -11.262           -10.697     -11.253     -10.759       41
+20  MediaControls  Media Controls       62        Normal   0  -15.966    -4.491      -4.491            -4.787            -4.195      -4.741      -4.186       41
+21  MediaControls  Media Controls       63        Normal   0  -11.111    -3.942      -3.942            -4.166            -3.718      -4.099      -3.692       41
+22  MediaControls  Media Controls       64        Normal   0  -11.314    -4.204      -4.204            -4.421            -3.987      -4.360      -3.932       41
+23  MediaControls  Media Controls       65        Normal   0  -22.109    -7.581      -7.581            -7.769            -7.393      -7.752      -7.374       41
+24  MediaControls  Media Controls       66        Normal   0  -32.762   -11.386     -11.386           -12.022           -10.750     -12.066     -10.588       41
+25  MediaControls  Media Controls       67        Normal   0  -17.107    -7.795      -7.795            -8.048            -7.541      -7.990      -7.542       41
+26  MediaControls  Media Controls       68        Normal   0  -16.001    -4.604      -4.604            -4.888            -4.319      -4.839      -4.332       41
+52    SulfideOnly    Sulfide Only        1        Conoco   0  -88.992   -37.918     -37.918           -39.162           -36.673     -39.178     -36.899       41
+33        Methane         Methane       18        Conoco   0 -127.262   -42.975     -42.975           -44.054           -41.896     -43.999     -41.903       41
+36        Methane         Methane       21        Conoco   0 -139.073   -31.978     -31.978           -33.146           -30.809     -32.903     -31.207       41
+1   MediaControls  Media Controls       43        Conoco   0  -60.976   -10.417     -10.417           -11.731            -9.102     -11.712      -9.481       41
+8   MediaControls  Media Controls       50       Extreme   0  -52.814   -24.581     -24.581           -25.216           -23.947     -24.925     -24.056       41
 ```
 
 ```r
@@ -714,7 +721,7 @@ For the sake of documentation and reproducibility, the current report was build 
 
 
 ```
-Report created by Will at 2014-02-15, 13:44:51 -0600
+Report created by Will at 2014-02-16, 22:50:21 -0600
 ```
 
 ```

@@ -155,7 +155,7 @@ g1 <- ggplot(dsSummary, aes(x=ProbeDepth, y=ProportionAtDepth, color=TreatmentPr
   coord_flip(xlim=c(-20, 0)) + #coord_flip() +
   reportTheme +
   guides(colour=guide_legend(title=NULL, override.aes=list(alpha=.2, size=5)), fill="none") +
-  labs(x=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)), y="Percent of Coupon's Probes at Depth")
+  labs(x=expression(Surface*phantom(1)*Damage*phantom(1)*(mu*m)), y="Percent of Points at Depth")
 
 g2 <- g1 + 
   geom_errorbarh(data=dsMlm, mapping=aes(x=Effect, xmin=SELower, xmax=SEUpper, y=.25, color=TreatmentPretty, group=NULL), size=1, alpha=.5, height=.05) +
@@ -183,7 +183,7 @@ gBoxAll <- ggplot(dsCouponAll, aes(x=TreatmentPretty, y=MeanDepth, color=Treatme
   scale_shape_manual(values=shapeOutlier) +
   reportTheme +
   guides(color="none", fill="none", shape="none") +
-  labs(title="Includes Five Outliers", x=NULL, y=expression(Probe*phantom(1)*Depth*phantom(1)*(mu*M)))
+  labs(title="Includes Five Outliers", x=NULL, y=expression(Surface*phantom(1)*Damage*phantom(1)*(mu*m)))
 # gBoxAll
 
 set.seed(seed=9789) #Set a seed so the jittered graphs are consistent across renders.
