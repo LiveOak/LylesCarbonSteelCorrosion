@@ -3,11 +3,11 @@ Welcome to the code repository for the [article](http://journal.frontiersin.org/
 Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion
 =========================
 
-Christopher N. Lyles [1](http://biocorrosioncenter.ou.edu/), 
-Huynh M. Le [1](http://biocorrosioncenter.ou.edu/), 
+[Christopher N. Lyles](http://students.ou.edu/L/Christopher.N.Lyles-1/Site/) [1](hhttp://mpbio.ou.edu/), 
+[Huynh M. Le](https://www.researchgate.net/profile/Huynh_Le2/) [1](http://mpbio.ou.edu/), 
 [William H. Beasley](http://scholar.google.com/citations?user=ffsJTC0AAAAJ&hl=en) [2](http://howardliveoak.com/), 
-[Michael J. McInerney](http://scholar.google.com/citations?user=M13EdqIAAAAJ&hl=en&oi=sra) [1](http://biocorrosioncenter.ou.edu/) and
-Joseph M. Suflita [1](http://biocorrosioncenter.ou.edu/) 
+[Michael J. McInerney](http://mpbio.ou.edu/michael-j-mcinerney) [1](http://mpbio.ou.edu/) and
+[Joseph M. Suflita](http://mpbio.ou.edu/joseph-m-sulfita-ph-d) [1](http://mpbio.ou.edu/) 
 (2014). *[Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion.](http://journal.frontiersin.org/Journal/10.3389/fmicb.2014.00114/)* Frontiers in Microbiology 5:114. doi: 10.3389/fmicb.2014.00114.
 
 Organization 1: [Department of Microbiology and Plant Biology](http://mpbio.ou.edu/), [Institute for Energy and the Environment](http://vpr-norman.ou.edu/centers-institutes/list/ou-institute-energy-and-environment), and the [OU Biocorrosion Center](http://biocorrosioncenter.ou.edu/), [University of Oklahoma](http://www.ou.edu/), Norman, OK, USA; Organization 2: [Howard Live Oak, LLC](http://howardliveoak.com/), USA
