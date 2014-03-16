@@ -1,4 +1,6 @@
-Analysis of Anaerobic Corrosion of Carbon Steel Coupons
+Welcome to the code repository for the [article](http://journal.frontiersin.org/Journal/10.3389/fmicb.2014.00114/):
+
+Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion
 =========================
 
 Christopher N. Lyles [1](http://biocorrosioncenter.ou.edu/), 
