@@ -1,12 +1,11 @@
 Welcome to the code repository for the [article](http://journal.frontiersin.org/Journal/10.3389/fmicb.2014.00114/):
 
-Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion
-=========================
+## Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion
 
 [Christopher N. Lyles](http://students.ou.edu/L/Christopher.N.Lyles-1/Site/) [1](hhttp://mpbio.ou.edu/), 
 [Huynh M. Le](https://www.researchgate.net/profile/Huynh_Le2/) [1](http://mpbio.ou.edu/), 
 [William H. Beasley](http://scholar.google.com/citations?user=ffsJTC0AAAAJ&hl=en) [2](http://howardliveoak.com/), 
-[Michael J. McInerney](http://mpbio.ou.edu/michael-j-mcinerney) [1](http://mpbio.ou.edu/) and
+[Michael J.](http://scholar.google.com/citations?user=M13EdqIAAAAJ&hl=en&oi=sra) [McInerney](http://mpbio.ou.edu/michael-j-mcinerney) [1](http://mpbio.ou.edu/) and
 [Joseph M. Suflita](http://mpbio.ou.edu/joseph-m-sulfita-ph-d) [1](http://mpbio.ou.edu/) 
 (2014). *[Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion.](http://journal.frontiersin.org/Journal/10.3389/fmicb.2014.00114/)* Frontiers in Microbiology 5:114. doi: 10.3389/fmicb.2014.00114.
 
