@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/4971/LiveOak/LylesCarbonSteelCorrosion.png)](http://dx.doi.org/10.5281/zenodo.12212)
+
 Welcome to the code repository for the [article](http://journal.frontiersin.org/Journal/10.3389/fmicb.2014.00114/):
 
 ## Anaerobic hydrocarbon and fatty acid metabolism by syntrophic bacteria and their impact on carbon steel corrosion
@@ -39,3 +41,6 @@ The following directories are part of the repository:
  * `Documentation/ImagesFromLab`: Images used to within our team's internal communication.  Also make sure to see all the images in the article's [supplementary material](http://www.frontiersin.org/journal/10.3389/fmicb.2014.
 00114/abstract).
  * `UtilityScripts`: R scripts that help automate certain tasks, including reproducing the analysis and figures in this repository.
+
+## Code Repository
+The analysis is written primarily in R, under the GPL-2 License.  The DOI of the *repository* (not of the article) is [10.5281/zenodo.12212](https://zenodo.org/record/12212).
