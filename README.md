@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/4971/LiveOak/LylesCarbonSteelCorrosion.png)](http://dx.doi.org/10.5281/zenodo.12212)
+[![DOI](https://zenodo.org/badge/16785697.svg)](https://zenodo.org/badge/latestdoi/16785697)
 
 Welcome to the code repository for the [article](http://journal.frontiersin.org/Journal/10.3389/fmicb.2014.00114/):
 
@@ -37,7 +37,7 @@ When the repository is installed on your local machine, and the [R](http://cran.
 ## Directories
 The following directories are part of the repository:
  * `Datasets/Raw`: CSV versions of the initial dataset.  It is readable from GitHub, or any text editor.
- * `Datasets/Raw`: RDS versions of the derivative dataset.  It is readable only from [R](http://cran.rstudio.com/).
+ * `Datasets/Derived`: RDS versions of the derivative dataset.  It is readable only from [R](http://cran.rstudio.com/).
  * `Code`: The [data manipulation code](./Code/AugmentData.R) and [analytical code](./Code/EstimateMlmMcmc/EstimateMlmMcmc.R) that compares pit depths across groups.  It also contains the [techinical output](/Code/EstimateMlmMcmc/EstimateMlmMcmc.html) from the multilevel model, estimated with an MCMC in [MCMCglmm](http://cran.r-project.org/web/packages/MCMCglmm/index.html).
  * `Analysis`: The analytical code and [report](/Analysis/CouponDepth.html) that places the MCMC results into the context of microbiology.
  * `Documentation/ImagesFromLab`: Images used to within our team's internal communication.  Also make sure to see all the images in the article's [supplementary material](http://www.frontiersin.org/journal/10.3389/fmicb.2014.
@@ -45,4 +45,4 @@ The following directories are part of the repository:
  * `UtilityScripts`: R scripts that help automate certain tasks, including reproducing the analysis and figures in this repository.
 
 ## Code Repository
-The analysis is written primarily in R, under the GPL-2 License.  The DOI of the *repository* (not of the article) is [10.5281/zenodo.12212](https://zenodo.org/record/12212).
+The analysis is written primarily in R, under the GPL-2 License.  The DOI of the *repository* (not of the article) is [10.5281/zenodo.439415](https://zenodo.org/badge/latestdoi/16785697).
